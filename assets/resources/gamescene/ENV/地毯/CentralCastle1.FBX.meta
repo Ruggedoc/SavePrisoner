@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "f67a7af5-435e-4305-a9e2-d2416c0da336",
+  "files": [],
+  "subMetas": {
+    "0b252": {
+      "importer": "gltf-mesh",
+      "uuid": "f67a7af5-435e-4305-a9e2-d2416c0da336@0b252",
+      "displayName": "",
+      "id": "0b252",
+      "name": "CentralCastle1.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 2
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "af224": {
+      "importer": "gltf-embeded-image",
+      "uuid": "f67a7af5-435e-4305-a9e2-d2416c0da336@af224",
+      "displayName": "",
+      "id": "af224",
+      "name": "EnvSamplerTex.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "f1c0d": {
+      "importer": "texture",
+      "uuid": "f67a7af5-435e-4305-a9e2-d2416c0da336@f1c0d",
+      "displayName": "",
+      "id": "f1c0d",
+      "name": "EnvSamplerTex.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "f67a7af5-435e-4305-a9e2-d2416c0da336@af224"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "d99bb": {
+      "importer": "gltf-material",
+      "uuid": "f67a7af5-435e-4305-a9e2-d2416c0da336@d99bb",
+      "displayName": "",
+      "id": "d99bb",
+      "name": "CentralCastle_c_x1024_Mat_1.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "4d9f7": {
+      "importer": "gltf-scene",
+      "uuid": "f67a7af5-435e-4305-a9e2-d2416c0da336@4d9f7",
+      "displayName": "",
+      "id": "4d9f7",
+      "name": "CentralCastle1.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "EnvSamplerTex",
+        "uri": "f67a7af5-435e-4305-a9e2-d2416c0da336@af224"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "f67a7af5-435e-4305-a9e2-d2416c0da336@0b252"
+      ],
+      "skeletons": [],
+      "textures": [
+        "f67a7af5-435e-4305-a9e2-d2416c0da336@f1c0d"
+      ],
+      "materials": [
+        "f67a7af5-435e-4305-a9e2-d2416c0da336@d99bb"
+      ],
+      "scenes": [
+        "f67a7af5-435e-4305-a9e2-d2416c0da336@4d9f7"
+      ]
+    }
+  }
+}

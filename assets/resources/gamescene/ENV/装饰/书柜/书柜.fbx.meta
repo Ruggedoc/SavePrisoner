@@ -1,0 +1,99 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "041a4458-7b74-4134-a3d6-37e81ae16666",
+  "files": [],
+  "subMetas": {
+    "16f07": {
+      "importer": "gltf-mesh",
+      "uuid": "041a4458-7b74-4134-a3d6-37e81ae16666@16f07",
+      "displayName": "",
+      "id": "16f07",
+      "name": "CentralCastleModules4.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 200
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "039bc": {
+      "importer": "gltf-material",
+      "uuid": "041a4458-7b74-4134-a3d6-37e81ae16666@039bc",
+      "displayName": "",
+      "id": "039bc",
+      "name": "WorldGridMaterial.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "04da2": {
+      "importer": "gltf-scene",
+      "uuid": "041a4458-7b74-4134-a3d6-37e81ae16666@04da2",
+      "displayName": "",
+      "id": "04da2",
+      "name": "书柜.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "041a4458-7b74-4134-a3d6-37e81ae16666@16f07"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "041a4458-7b74-4134-a3d6-37e81ae16666@039bc"
+      ],
+      "scenes": [
+        "041a4458-7b74-4134-a3d6-37e81ae16666@04da2"
+      ]
+    },
+    "meshCompress": {
+      "enable": false
+    }
+  }
+}

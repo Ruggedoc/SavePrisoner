@@ -1,0 +1,99 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "125e74cb-20e8-48f0-969f-624a56823ebb",
+  "files": [],
+  "subMetas": {
+    "17696": {
+      "importer": "gltf-material",
+      "uuid": "125e74cb-20e8-48f0-969f-624a56823ebb@17696",
+      "displayName": "",
+      "id": "17696",
+      "name": "CellModules.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0e2c1": {
+      "importer": "gltf-mesh",
+      "uuid": "125e74cb-20e8-48f0-969f-624a56823ebb@0e2c1",
+      "displayName": "",
+      "id": "0e2c1",
+      "name": "Bookcase1.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 202
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "85d38": {
+      "importer": "gltf-scene",
+      "uuid": "125e74cb-20e8-48f0-969f-624a56823ebb@85d38",
+      "displayName": "",
+      "id": "85d38",
+      "name": "小书柜.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "125e74cb-20e8-48f0-969f-624a56823ebb@0e2c1"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "125e74cb-20e8-48f0-969f-624a56823ebb@17696"
+      ],
+      "scenes": [
+        "125e74cb-20e8-48f0-969f-624a56823ebb@85d38"
+      ]
+    },
+    "meshCompress": {
+      "enable": false
+    }
+  }
+}

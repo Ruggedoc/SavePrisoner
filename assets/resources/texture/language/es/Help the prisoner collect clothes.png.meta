@@ -1,0 +1,134 @@
+{
+  "ver": "1.0.27",
+  "importer": "image",
+  "imported": true,
+  "uuid": "3bf67227-da67-4a8b-b09f-31e8a21ba6cc",
+  "files": [
+    ".json",
+    ".png"
+  ],
+  "subMetas": {
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "3bf67227-da67-4a8b-b09f-31e8a21ba6cc@6c48a",
+      "displayName": "Help the prisoner collect clothes",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "clamp-to-edge",
+        "wrapModeT": "clamp-to-edge",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "3bf67227-da67-4a8b-b09f-31e8a21ba6cc",
+        "visible": false
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "3bf67227-da67-4a8b-b09f-31e8a21ba6cc@f9941",
+      "displayName": "Help the prisoner collect clothes",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 1,
+        "trimX": 28,
+        "trimY": 1,
+        "width": 537,
+        "height": 43,
+        "rawWidth": 593,
+        "rawHeight": 47,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "pixelsToUnit": 100,
+        "pivotX": 0.5,
+        "pivotY": 0.5,
+        "meshType": 0,
+        "vertices": {
+          "rawPosition": [
+            -268.5,
+            -21.5,
+            0,
+            268.5,
+            -21.5,
+            0,
+            -268.5,
+            21.5,
+            0,
+            268.5,
+            21.5,
+            0
+          ],
+          "indexes": [
+            0,
+            1,
+            2,
+            2,
+            1,
+            3
+          ],
+          "uv": [
+            28,
+            46,
+            565,
+            46,
+            28,
+            3,
+            565,
+            3
+          ],
+          "nuv": [
+            0.047217537942664416,
+            0.06382978723404255,
+            0.9527824620573356,
+            0.06382978723404255,
+            0.047217537942664416,
+            0.9787234042553191,
+            0.9527824620573356,
+            0.9787234042553191
+          ],
+          "minPos": [
+            -268.5,
+            -21.5,
+            0
+          ],
+          "maxPos": [
+            268.5,
+            21.5,
+            0
+          ]
+        },
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "3bf67227-da67-4a8b-b09f-31e8a21ba6cc@6c48a",
+        "atlasUuid": ""
+      },
+      "ver": "1.0.12",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "hasAlpha": true,
+    "type": "sprite-frame",
+    "fixAlphaTransparencyArtifacts": false,
+    "redirect": "3bf67227-da67-4a8b-b09f-31e8a21ba6cc@6c48a"
+  }
+}

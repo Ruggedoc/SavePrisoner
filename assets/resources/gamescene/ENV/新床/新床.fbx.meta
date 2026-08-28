@@ -1,0 +1,168 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "88378277-fb08-48a1-b734-bb04fbf9f316",
+  "files": [],
+  "subMetas": {
+    "81ae3": {
+      "importer": "gltf-mesh",
+      "uuid": "88378277-fb08-48a1-b734-bb04fbf9f316@81ae3",
+      "displayName": "",
+      "id": "81ae3",
+      "name": "带短梯子的上下铺.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 212
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a6dfc": {
+      "importer": "gltf-mesh",
+      "uuid": "88378277-fb08-48a1-b734-bb04fbf9f316@a6dfc",
+      "displayName": "",
+      "id": "a6dfc",
+      "name": "梯子.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 38
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "1cdc4": {
+      "importer": "gltf-embeded-image",
+      "uuid": "88378277-fb08-48a1-b734-bb04fbf9f316@1cdc4",
+      "displayName": "",
+      "id": "1cdc4",
+      "name": "贴图 #3.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": false,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".jpg",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "bfae8": {
+      "importer": "texture",
+      "uuid": "88378277-fb08-48a1-b734-bb04fbf9f316@bfae8",
+      "displayName": "",
+      "id": "bfae8",
+      "name": "贴图 #3.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "88378277-fb08-48a1-b734-bb04fbf9f316@1cdc4"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "489e0": {
+      "importer": "gltf-material",
+      "uuid": "88378277-fb08-48a1-b734-bb04fbf9f316@489e0",
+      "displayName": "",
+      "id": "489e0",
+      "name": "Material #39.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "545ad": {
+      "importer": "gltf-scene",
+      "uuid": "88378277-fb08-48a1-b734-bb04fbf9f316@545ad",
+      "displayName": "",
+      "id": "545ad",
+      "name": "新床.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "贴图 #3",
+        "uri": "88378277-fb08-48a1-b734-bb04fbf9f316@1cdc4"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "88378277-fb08-48a1-b734-bb04fbf9f316@81ae3",
+        "88378277-fb08-48a1-b734-bb04fbf9f316@a6dfc"
+      ],
+      "skeletons": [],
+      "textures": [
+        "88378277-fb08-48a1-b734-bb04fbf9f316@bfae8"
+      ],
+      "materials": [
+        "88378277-fb08-48a1-b734-bb04fbf9f316@489e0"
+      ],
+      "scenes": [
+        "88378277-fb08-48a1-b734-bb04fbf9f316@545ad"
+      ]
+    },
+    "meshCompress": {
+      "enable": false
+    }
+  }
+}

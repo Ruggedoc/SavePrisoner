@@ -1,0 +1,137 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "979f6121-ec51-4df7-bfad-21eb78542ef3",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "73b7f": {
+      "importer": "gltf-animation",
+      "uuid": "979f6121-ec51-4df7-bfad-21eb78542ef3@73b7f",
+      "displayName": "",
+      "id": "73b7f",
+      "name": "attack.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 1,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.6666666269302368
+        },
+        "events": [
+          {
+            "frame": 0.5,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.5,
+            "func": "opentx",
+            "params": []
+          },
+          {
+            "frame": 0.6,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.6,
+            "func": "onAttackPoint",
+            "params": []
+          },
+          {
+            "frame": 1.3666666666666667,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 1.3666666666666667,
+            "func": "colsetx",
+            "params": []
+          }
+        ],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "speed": 1.3,
+        "auxiliaryCurves": {}
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "7ba8c": {
+      "importer": "gltf-scene",
+      "uuid": "979f6121-ec51-4df7-bfad-21eb78542ef3@7ba8c",
+      "displayName": "",
+      "id": "7ba8c",
+      "name": "女囚囚服-attack.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 1.6666666269302368,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "attack",
+            "from": 0,
+            "to": 1.6666666269302368,
+            "wrapMode": 1,
+            "previousId": "73b7f",
+            "speed": 1.3
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "979f6121-ec51-4df7-bfad-21eb78542ef3@7ba8c"
+      ]
+    }
+  }
+}

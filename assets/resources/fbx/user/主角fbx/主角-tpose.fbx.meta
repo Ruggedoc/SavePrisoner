@@ -1,0 +1,515 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "30732": {
+      "importer": "gltf-skeleton",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@30732",
+      "displayName": "",
+      "id": "30732",
+      "name": "UnnamedSkeleton-0.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 26
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "cbd78": {
+      "importer": "gltf-mesh",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@cbd78",
+      "displayName": "",
+      "id": "cbd78",
+      "name": "s1.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 869
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c7d74": {
+      "importer": "gltf-mesh",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@c7d74",
+      "displayName": "",
+      "id": "c7d74",
+      "name": "jingmao.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 146
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "365dd": {
+      "importer": "gltf-mesh",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@365dd",
+      "displayName": "",
+      "id": "365dd",
+      "name": "chutou_shengji.mesh",
+      "userData": {
+        "gltfIndex": 2,
+        "triangleCount": 338
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "73b7f": {
+      "importer": "gltf-animation",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@73b7f",
+      "displayName": "",
+      "id": "73b7f",
+      "name": "Take 001.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.7333333492279053
+        },
+        "events": [],
+        "additive": {
+          "enabled": false
+        }
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "f1394": {
+      "importer": "gltf-skeleton",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@f1394",
+      "displayName": "",
+      "id": "f1394",
+      "name": "UnnamedSkeleton-1.skeleton",
+      "userData": {
+        "gltfIndex": 1,
+        "jointsLength": 1
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "123d6": {
+      "importer": "gltf-embeded-image",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@123d6",
+      "displayName": "",
+      "id": "123d6",
+      "name": "贴图 #50.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "89b4f": {
+      "importer": "texture",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@89b4f",
+      "displayName": "",
+      "id": "89b4f",
+      "name": "贴图 #50.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "b145f125-c498-4638-bd64-a1dc50da6ae7@123d6"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "928c2": {
+      "importer": "texture",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@928c2",
+      "displayName": "",
+      "id": "928c2",
+      "name": "贴图 #52.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": false,
+        "imageUuidOrDatabaseUri": "db://assets/resources/fbx/user/主角fbx/T_yujing_zhujue.jpg"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "e3cf8": {
+      "importer": "gltf-material",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@e3cf8",
+      "displayName": "",
+      "id": "e3cf8",
+      "name": "Material #13.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "608b5": {
+      "importer": "gltf-material",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@608b5",
+      "displayName": "",
+      "id": "608b5",
+      "name": "Material #15.material",
+      "userData": {
+        "gltfIndex": 1
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "7a3ca": {
+      "importer": "gltf-material",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@7a3ca",
+      "displayName": "",
+      "id": "7a3ca",
+      "name": "lambert2.material",
+      "userData": {
+        "gltfIndex": 2
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "55b43": {
+      "importer": "gltf-material",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@55b43",
+      "displayName": "",
+      "id": "55b43",
+      "name": "lambert3.material",
+      "userData": {
+        "gltfIndex": 3
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "482a8": {
+      "importer": "gltf-scene",
+      "uuid": "b145f125-c498-4638-bd64-a1dc50da6ae7@482a8",
+      "displayName": "",
+      "id": "482a8",
+      "name": "主角-tpose.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "贴图 #50",
+        "uri": "b145f125-c498-4638-bd64-a1dc50da6ae7@123d6"
+      },
+      {
+        "name": "贴图 #52",
+        "uri": "db://assets/resources/fbx/user/主角fbx/T_yujing_zhujue.jpg"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 0.7333333492279053,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Take 001",
+            "from": 0,
+            "to": 0.7333333492279053,
+            "wrapMode": 2,
+            "previousId": "73b7f",
+            "additive": {
+              "enabled": false
+            }
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@cbd78",
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@c7d74",
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@365dd"
+      ],
+      "skeletons": [
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@30732",
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@f1394"
+      ],
+      "textures": [
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@89b4f",
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@928c2"
+      ],
+      "materials": [
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@e3cf8",
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@608b5",
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@7a3ca",
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@55b43"
+      ],
+      "scenes": [
+        "b145f125-c498-4638-bd64-a1dc50da6ae7@482a8"
+      ]
+    },
+    "materials": {
+      "b145f125-c498-4638-bd64-a1dc50da6ae7@7a3ca": {
+        "__type__": "cc.Material",
+        "_name": "",
+        "_objFlags": 0,
+        "__editorExtras__": {},
+        "_native": "",
+        "_effectAsset": {
+          "__uuid__": "f648964e-8d32-41fc-9ac9-7a1e714dd17b",
+          "__expectedType__": "cc.EffectAsset"
+        },
+        "_techIdx": 0,
+        "_defines": [
+          {
+            "USE_INSTANCING": true,
+            "DCC_APP_NAME": 1
+          },
+          {},
+          {},
+          {}
+        ],
+        "_states": [
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          }
+        ],
+        "_props": [
+          {
+            "mainColor": {
+              "__type__": "cc.Color",
+              "r": 170,
+              "g": 170,
+              "b": 170,
+              "a": 255
+            },
+            "emissiveScale": 0,
+            "shininessExponent": 1.0717734098434448,
+            "specularColor": {
+              "__type__": "cc.Color",
+              "r": 0,
+              "g": 0,
+              "b": 0,
+              "a": 255
+            },
+            "specularFactor": 0
+          },
+          {},
+          {},
+          {}
+        ]
+      },
+      "b145f125-c498-4638-bd64-a1dc50da6ae7@55b43": {
+        "__type__": "cc.Material",
+        "_name": "",
+        "_objFlags": 0,
+        "__editorExtras__": {},
+        "_native": "",
+        "_effectAsset": {
+          "__uuid__": "f648964e-8d32-41fc-9ac9-7a1e714dd17b",
+          "__expectedType__": "cc.EffectAsset"
+        },
+        "_techIdx": 0,
+        "_defines": [
+          {
+            "USE_INSTANCING": true,
+            "DCC_APP_NAME": 1
+          },
+          {},
+          {},
+          {}
+        ],
+        "_states": [
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          }
+        ],
+        "_props": [
+          {
+            "mainColor": {
+              "__type__": "cc.Color",
+              "r": 170,
+              "g": 170,
+              "b": 170,
+              "a": 255
+            },
+            "emissiveScale": 0,
+            "shininessExponent": 1.0717734098434448,
+            "specularColor": {
+              "__type__": "cc.Color",
+              "r": 0,
+              "g": 0,
+              "b": 0,
+              "a": 255
+            },
+            "specularFactor": 0
+          },
+          {},
+          {},
+          {}
+        ]
+      }
+    }
+  }
+}

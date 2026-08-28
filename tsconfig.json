@@ -1,0 +1,17 @@
+{
+  /* Base configuration. Do not edit this field. */
+  "extends": "./temp/tsconfig.cocos.json",
+
+  /* Add your custom configuration here. */
+  "compilerOptions": {
+    "strict": true,
+    "module": "node16",
+    "strictPropertyInitialization": false,  // 解决属性在 onLoad 赋值的问题
+    "strictNullChecks": false,              // 允许 null/undefined 赋值给任何类型
+    "noImplicitReturns": false,             // 不强制函数所有分支都有返回值
+    "noUnusedLocals": false,                // 不检查未使用的局部变量（Cocos 中很常见）
+    "noUnusedParameters": false,            // 不检查未使用的函数参数
+    "noImplicitAny": false,                 // 不检查不明确类型的参数
+    "moduleResolution": "node16"
+  }
+}

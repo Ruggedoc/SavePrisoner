@@ -1,0 +1,322 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "85619": {
+      "importer": "gltf-animation",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@85619",
+      "displayName": "",
+      "id": "85619",
+      "name": "death.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 1,
+        "speed": 1,
+        "sample": 30,
+        "span": {
+          "from": 4.333333333333333,
+          "to": 4.866666793823242
+        },
+        "events": [
+          {
+            "frame": 0.16666666666666666,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.16666666666666666,
+            "func": "onDeathAudio",
+            "params": []
+          }
+        ],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "auxiliaryCurves": {}
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "69c45": {
+      "importer": "gltf-mesh",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@69c45",
+      "displayName": "",
+      "id": "69c45",
+      "name": "ls.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 1830
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "73b7f": {
+      "importer": "gltf-animation",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@73b7f",
+      "displayName": "",
+      "id": "73b7f",
+      "name": "idle.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0.8,
+          "to": 2.1333333333333333
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "24c9f": {
+      "importer": "gltf-animation",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@24c9f",
+      "displayName": "",
+      "id": "24c9f",
+      "name": "move.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "speed": 1,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.5
+        },
+        "events": [],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "auxiliaryCurves": {}
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "989ed": {
+      "importer": "gltf-animation",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@989ed",
+      "displayName": "",
+      "id": "989ed",
+      "name": "attack.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 1,
+        "speed": 1,
+        "sample": 30,
+        "span": {
+          "from": 2.5,
+          "to": 3.5
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "79e35": {
+      "importer": "gltf-animation",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@79e35",
+      "displayName": "",
+      "id": "79e35",
+      "name": "hit.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 1,
+        "speed": 1,
+        "sample": 30,
+        "span": {
+          "from": 3.6666666666666665,
+          "to": 4.1
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "438fe": {
+      "importer": "gltf-skeleton",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@438fe",
+      "displayName": "",
+      "id": "438fe",
+      "name": "UnnamedSkeleton.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 24
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "7ff75": {
+      "importer": "gltf-material",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@7ff75",
+      "displayName": "",
+      "id": "7ff75",
+      "name": "Material #27.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "1fbcb": {
+      "importer": "gltf-material",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@1fbcb",
+      "displayName": "",
+      "id": "1fbcb",
+      "name": "Material #28.material",
+      "userData": {
+        "gltfIndex": 1
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f7098": {
+      "importer": "gltf-scene",
+      "uuid": "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@f7098",
+      "displayName": "",
+      "id": "f7098",
+      "name": "鼠.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 4.866666793823242,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "idle",
+            "from": 0.8,
+            "to": 2.1333333333333333,
+            "wrapMode": 2,
+            "previousId": "73b7f"
+          },
+          {
+            "name": "move",
+            "from": 0,
+            "to": 0.5,
+            "wrapMode": 2,
+            "speed": 1,
+            "previousId": "24c9f"
+          },
+          {
+            "name": "attack",
+            "from": 2.5,
+            "to": 3.5,
+            "wrapMode": 1,
+            "speed": 1,
+            "previousId": "989ed"
+          },
+          {
+            "name": "hit",
+            "from": 3.6666666666666665,
+            "to": 4.1,
+            "wrapMode": 1,
+            "speed": 1,
+            "previousId": "79e35"
+          },
+          {
+            "name": "death",
+            "from": 4.333333333333333,
+            "to": 4.866666793823242,
+            "wrapMode": 1,
+            "speed": 1,
+            "previousId": "85619"
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@69c45"
+      ],
+      "skeletons": [
+        "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@438fe"
+      ],
+      "textures": [],
+      "materials": [
+        "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@7ff75",
+        "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@1fbcb"
+      ],
+      "scenes": [
+        "5fbbbdff-2db9-4e18-9b19-dd8fb4dab335@f7098"
+      ]
+    }
+  }
+}

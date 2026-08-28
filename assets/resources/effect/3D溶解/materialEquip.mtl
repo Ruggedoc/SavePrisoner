@@ -1,0 +1,115 @@
+{
+  "__type__": "cc.Material",
+  "_name": "",
+  "_objFlags": 0,
+  "__editorExtras__": {},
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "c6336004-dfa1-4fec-847e-91353f5678e5",
+    "__expectedType__": "cc.EffectAsset"
+  },
+  "_techIdx": 0,
+  "_defines": [
+    {
+      "USE_EFFECT": true,
+      "USE_INSTANCING": true,
+      "USE_ALBEDO_MAP": true
+    },
+    {},
+    {},
+    {},
+    {},
+    {}
+  ],
+  "_states": [
+    {
+      "rasterizerState": {
+        "cullMode": 0
+      },
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    }
+  ],
+  "_props": [
+    {
+      "roughness": 0.6,
+      "metallic": 0.2,
+      "mainTexture": {
+        "__uuid__": "1ae7f5f4-22e0-49d4-8e43-0ea0996511fd@6c48a",
+        "__expectedType__": "cc.Texture2D"
+      },
+      "noiseMap": {
+        "__uuid__": "c256400b-76c7-44fc-ae6d-77619083e9b4@6c48a",
+        "__expectedType__": "cc.Texture2D"
+      },
+      "dissolveColor1": {
+        "__type__": "cc.Color",
+        "r": 214,
+        "g": 126,
+        "b": 13,
+        "a": 255
+      },
+      "dissolveColor2": {
+        "__type__": "cc.Color",
+        "r": 214,
+        "g": 126,
+        "b": 13,
+        "a": 255
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {}
+  ]
+}

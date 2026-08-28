@@ -1,0 +1,78 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "2b6eede5-0487-4e24-a387-6f5cfac9727c",
+  "files": [],
+  "subMetas": {
+    "910ac": {
+      "importer": "gltf-mesh",
+      "uuid": "2b6eede5-0487-4e24-a387-6f5cfac9727c@910ac",
+      "displayName": "",
+      "id": "910ac",
+      "name": "muban.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 100
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c5af4": {
+      "importer": "gltf-scene",
+      "uuid": "2b6eede5-0487-4e24-a387-6f5cfac9727c@c5af4",
+      "displayName": "",
+      "id": "c5af4",
+      "name": "muban.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "2b6eede5-0487-4e24-a387-6f5cfac9727c@910ac"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "2b6eede5-0487-4e24-a387-6f5cfac9727c@c5af4"
+      ]
+    }
+  }
+}

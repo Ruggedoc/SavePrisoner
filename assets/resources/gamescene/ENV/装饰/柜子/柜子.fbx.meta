@@ -1,0 +1,99 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "db08e217-b96e-4a6e-a909-bc9797ad9064",
+  "files": [],
+  "subMetas": {
+    "bdd28": {
+      "importer": "gltf-mesh",
+      "uuid": "db08e217-b96e-4a6e-a909-bc9797ad9064@bdd28",
+      "displayName": "",
+      "id": "bdd28",
+      "name": "CleanRoom32.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 60
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "67c1b": {
+      "importer": "gltf-material",
+      "uuid": "db08e217-b96e-4a6e-a909-bc9797ad9064@67c1b",
+      "displayName": "",
+      "id": "67c1b",
+      "name": "CleanRoom__1_.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "ac1d4": {
+      "importer": "gltf-scene",
+      "uuid": "db08e217-b96e-4a6e-a909-bc9797ad9064@ac1d4",
+      "displayName": "",
+      "id": "ac1d4",
+      "name": "柜子.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "db08e217-b96e-4a6e-a909-bc9797ad9064@bdd28"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "db08e217-b96e-4a6e-a909-bc9797ad9064@67c1b"
+      ],
+      "scenes": [
+        "db08e217-b96e-4a6e-a909-bc9797ad9064@ac1d4"
+      ]
+    },
+    "meshCompress": {
+      "enable": false
+    }
+  }
+}

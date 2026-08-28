@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3",
+  "files": [],
+  "subMetas": {
+    "4d4bb": {
+      "importer": "gltf-mesh",
+      "uuid": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@4d4bb",
+      "displayName": "",
+      "id": "4d4bb",
+      "name": "雪树.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 593
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "1fda3": {
+      "importer": "gltf-embeded-image",
+      "uuid": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@1fda3",
+      "displayName": "",
+      "id": "1fda3",
+      "name": "Map #10.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "0edaf": {
+      "importer": "texture",
+      "uuid": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@0edaf",
+      "displayName": "",
+      "id": "0edaf",
+      "name": "Map #10.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@1fda3"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "6a93e": {
+      "importer": "gltf-material",
+      "uuid": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@6a93e",
+      "displayName": "",
+      "id": "6a93e",
+      "name": "Material #34.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "9cbf3": {
+      "importer": "gltf-scene",
+      "uuid": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@9cbf3",
+      "displayName": "",
+      "id": "9cbf3",
+      "name": "ROJ_雪树.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "Map #10",
+        "uri": "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@1fda3"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@4d4bb"
+      ],
+      "skeletons": [],
+      "textures": [
+        "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@0edaf"
+      ],
+      "materials": [
+        "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@6a93e"
+      ],
+      "scenes": [
+        "9182aa22-2ccd-4190-ad8f-0f5c29bd3ce3@9cbf3"
+      ]
+    }
+  }
+}

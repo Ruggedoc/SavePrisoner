@@ -1,0 +1,319 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "16266": {
+      "importer": "gltf-material",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@16266",
+      "displayName": "",
+      "id": "16266",
+      "name": "Material #77.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "3f0c5": {
+      "importer": "gltf-mesh",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@3f0c5",
+      "displayName": "",
+      "id": "3f0c5",
+      "name": "Box002.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 134
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "684db": {
+      "importer": "gltf-mesh",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@684db",
+      "displayName": "",
+      "id": "684db",
+      "name": "Cylinder002.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 428
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "73b7f": {
+      "importer": "gltf-animation",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@73b7f",
+      "displayName": "",
+      "id": "73b7f",
+      "name": "attack.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 1,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2.7666666507720947
+        },
+        "events": [
+          {
+            "frame": 0.7,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.7,
+            "func": "onPlayHummerDown",
+            "params": []
+          },
+          {
+            "frame": 0.7666666666666667,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.7666666666666667,
+            "func": "onHummerDown",
+            "params": []
+          },
+          {
+            "frame": 0.9666666666666667,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.9666666666666667,
+            "func": "onPlayIceBreak",
+            "params": []
+          },
+          {
+            "frame": 1.6666666666666667,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 1.6666666666666667,
+            "func": "onNpcCreate",
+            "params": []
+          }
+        ],
+        "speed": 3,
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "auxiliaryCurves": {}
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "d412c": {
+      "importer": "gltf-embeded-image",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@d412c",
+      "displayName": "",
+      "id": "d412c",
+      "name": "贴图 #13.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "f43bd": {
+      "importer": "gltf-embeded-image",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@f43bd",
+      "displayName": "",
+      "id": "f43bd",
+      "name": "贴图 #12.image",
+      "userData": {
+        "gltfIndex": 1,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "baf1c": {
+      "importer": "texture",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@baf1c",
+      "displayName": "",
+      "id": "baf1c",
+      "name": "贴图 #13.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "dd6abb14-508c-4f6a-bd32-a42fd106088a@d412c"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "5f79d": {
+      "importer": "texture",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@5f79d",
+      "displayName": "",
+      "id": "5f79d",
+      "name": "贴图 #12.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "dd6abb14-508c-4f6a-bd32-a42fd106088a@f43bd"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "4d0ca": {
+      "importer": "gltf-material",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@4d0ca",
+      "displayName": "",
+      "id": "4d0ca",
+      "name": "Material #76.material",
+      "userData": {
+        "gltfIndex": 1
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "e114a": {
+      "importer": "gltf-scene",
+      "uuid": "dd6abb14-508c-4f6a-bd32-a42fd106088a@e114a",
+      "displayName": "",
+      "id": "e114a",
+      "name": "锤.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "贴图 #13",
+        "uri": "dd6abb14-508c-4f6a-bd32-a42fd106088a@d412c"
+      },
+      {
+        "name": "贴图 #12",
+        "uri": "dd6abb14-508c-4f6a-bd32-a42fd106088a@f43bd"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 2.7666666507720947,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "attack",
+            "from": 0,
+            "to": 2.7666666507720947,
+            "wrapMode": 1,
+            "previousId": "73b7f",
+            "speed": 3
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "dd6abb14-508c-4f6a-bd32-a42fd106088a@3f0c5",
+        "dd6abb14-508c-4f6a-bd32-a42fd106088a@684db"
+      ],
+      "skeletons": [],
+      "textures": [
+        "dd6abb14-508c-4f6a-bd32-a42fd106088a@baf1c",
+        "dd6abb14-508c-4f6a-bd32-a42fd106088a@5f79d"
+      ],
+      "materials": [
+        "dd6abb14-508c-4f6a-bd32-a42fd106088a@16266",
+        "dd6abb14-508c-4f6a-bd32-a42fd106088a@4d0ca"
+      ],
+      "scenes": [
+        "dd6abb14-508c-4f6a-bd32-a42fd106088a@e114a"
+      ]
+    }
+  }
+}
