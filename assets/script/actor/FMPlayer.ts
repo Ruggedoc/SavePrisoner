@@ -51,7 +51,7 @@ export class FMPlayer extends Component {
   public targetPos: Vec3 = null; //移动目标
   /**引导摄像机跟随 */
   public isYDNpcMove: boolean = false;
-  public followTime: number = 1.5;
+  public followTime: number = 0.3;
   public followCountDown: number = 0;
 
   start() {
@@ -77,12 +77,12 @@ export class FMPlayer extends Component {
     let nanNode = this.node.getChildByName("主角");
 
     this.playerTakeNpcPos = [
-      new Vec3(-0.95, 0.132, -0.95),
-      new Vec3(-1, 0.35, -0.4),
-      new Vec3(-1, -0.05, -0.3),
-      new Vec3(0.6, 0.65, 0),
-      new Vec3(0.75, -0.05, -0.3),
-      new Vec3(0.8, 0.26, 0.82),
+      new Vec3(0.09, 0, 0.67),
+      new Vec3(-0.385, 0.014, 0.673),
+      new Vec3(0.27, 0.347, 0.722),
+      new Vec3(-0.21, 0.255, 0.737),
+      new Vec3(0.278, 0.61, 0.733),
+      new Vec3(-0.444, 0.415, 0.775),
     ];
     nanNode.scale = Vec3.ZERO;
     tween(nanNode)
@@ -106,16 +106,21 @@ export class FMPlayer extends Component {
     }
     if (this.isYDNpcMove) {
       this.followCountDown += dt;
-      GameGlobal.CameraControl.cameraFollowForTarget(this.tou);
+      // GameGlobal.CameraControl.cameraFollowForTarget(this.tou);
       if (this.followCountDown >= this.followTime) {
         this.isYDNpcMove = false;
-        GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
-          let buyPoolNode: Node = GameGlobal.ditieList.getChildByName("buyOver");
-          let src = buyPoolNode.getComponent(ShopTrigger);
-          this.scheduleOnce(() => {
-            src.onNodeOpen();
-          }, 0.8);
-        });
+        let buyPoolNode: Node = GameGlobal.ditieList.getChildByName("buyOver");
+        let src = buyPoolNode.getComponent(ShopTrigger);
+        this.scheduleOnce(() => {
+          src.onNodeOpen();
+        }, 0.8);
+        // GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
+        //   let buyPoolNode: Node = GameGlobal.ditieList.getChildByName("buyOver");
+        //   let src = buyPoolNode.getComponent(ShopTrigger);
+        //   this.scheduleOnce(() => {
+        //     src.onNodeOpen();
+        //   }, 0.8);
+        // });
       }
     }
     if (this.state == -1) {
@@ -175,6 +180,8 @@ export class FMPlayer extends Component {
     if (dis > 0.3) {
       this.state = 4;
       return;
+    } else {
+      this.state = 1;
     }
   }
 
@@ -279,8 +286,8 @@ export class FMPlayer extends Component {
       this.doMove(dt, 0, this.takeOffPos.worldPosition, () => {});
       return;
     } else {
+      this.animPlay(PlayerAniState.Idle);
       if (GameGlobal.watarRoom.pan.children.length >= GameGlobal.waterOpenMax2) {
-        this.animPlay(PlayerAniState.Idle);
         return;
       }
       this.onThrowBody2(dt);
@@ -297,7 +304,8 @@ export class FMPlayer extends Component {
     if (bodyNode != null) {
       GameGlobal.curWaterBody++;
       GameGlobal.curPlayTakeBody--;
-      let targetPos = GameGlobal.watarRoom.getThrowTargetPos();
+      let posObject = GameGlobal.watarRoom.getThrowTargetPos();
+      let targetPos = posObject.pos;
       let targetRos = GameGlobal.watarRoom.getThrowTargetRot();
       let worldPos = bodyNode.worldPosition.clone();
       let worldRot = bodyNode.worldRotation.clone();
@@ -310,10 +318,26 @@ export class FMPlayer extends Component {
       // bodyNode.setRotationFromEuler(0, 0, 0);
       // bodyMod.setRotationFromEuler(0, 0, 0);
       bodyNode.worldScale = Vec3.ONE;
-      bodySrc.moveToPos(bodyNode, targetPos, 0.3, 0, false, true, targetRos, () => {
-        // AudioManager.soundPlay("jumpWater");
-        bodySrc.onPlayDefrostAni(bodyNode, () => {});
-      });
+      bodySrc.moveToPos(
+        bodyNode,
+        targetPos,
+        0.3,
+        0,
+        false,
+        true,
+        targetRos,
+        () => {
+          // AudioManager.soundPlay("jumpWater");
+          this.scheduleOnce(() => {
+            bodySrc.onPlayDefrostAni(bodyNode, () => {});
+          }, 0.2);
+        },
+        new Vec3(0, 2.5, 0),
+        0.8,
+        () => {
+          GameGlobal.watarRoom.playWaterEffect(posObject.index);
+        },
+      );
       // AudioManager.soundPlay("throwNpc");
     }
   }

@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, tween, v3, Vec3, Collider, Quat, Animation } from "cc";
+import { _decorator, Component, instantiate, Node, Prefab, tween, v3, Vec3, Collider, Quat, Animation, RigidBody } from "cc";
 import { GameGlobal } from "../GameGlobal";
 import { IceBox } from "./IceBox";
 import { Utils } from "../Utils";
@@ -57,6 +57,7 @@ export class IceBoxList extends Component {
 
   public isFristAni = true;
   public isFristYD = true;
+  public isTriggerOpen = false;
   currAnim: string;
 
   onLoad(): void {
@@ -66,10 +67,14 @@ export class IceBoxList extends Component {
     this.initHummer();
     this.loadIceBoxPos();
     this.initBodyPos();
-    let footcol = this.saveTrigger.getChildByName("pz").getComponent(Collider);
-    footcol.on("onTriggerEnter", this.onTrggerStart, this);
-    footcol.on("onTriggerStay", this.onTrggerStay, this);
-    footcol.on("onTriggerExit", this.onTrggerExit, this);
+    let footcoll = this.saveTrigger.getChildByName("pz").getComponent(Collider);
+    footcoll.on("onTriggerEnter", this.onTrggerStart, this);
+    footcoll.on("onTriggerStay", this.onTrggerStay2, this);
+    footcoll.on("onTriggerExit", this.onTrggerExit, this);
+
+    // let footJumpColl = this.saveTrigger.getChildByName("jumpPZ").getComponent(Collider);
+    // footJumpColl.on("onTriggerEnter", this.onJumpTrggerStart, this);
+    // footJumpColl.on("onTriggerExit", this.onJumpTrggerExit, this);
 
     this.anim1 = this.iceHummer0Ani.getComponent(Animation);
     this.anim2 = this.iceHummer1Ani.getComponent(Animation);
@@ -86,6 +91,24 @@ export class IceBoxList extends Component {
 
   /**解锁多个锤子 */
   public openAllHummer() {
+    // if (GameGlobal.buyHummerNum == 1) {
+    //   this.iceHummer1.active = true;
+    //   this.iceHummer1.getChildByName("loader").scale = Vec3.ZERO;
+    //   tween(this.iceHummer1.getChildByName("loader"))
+    //     .to(0.15, { scale: v3(1.2, 1.2, 1.2) })
+    //     .to(0.1, { scale: v3(0.9, 0.9, 0.9) })
+    //     .to(0.05, { scale: v3(1, 1, 1) })
+    //     .start();
+    // } else if (GameGlobal.buyHummerNum == 2) {
+    //   this.iceHummer2.active = true;
+    //   this.iceHummer2.getChildByName("loader").scale = Vec3.ZERO;
+    //   tween(this.iceHummer2.getChildByName("loader"))
+    //     .to(0.15, { scale: v3(1.2, 1.2, 1.2) })
+    //     .to(0.1, { scale: v3(0.9, 0.9, 0.9) })
+    //     .to(0.05, { scale: v3(1, 1, 1) })
+    //     .start();
+    // }
+
     this.iceHummer1.active = true;
     this.iceHummer1.getChildByName("loader").scale = Vec3.ZERO;
     tween(this.iceHummer1.getChildByName("loader"))
@@ -101,35 +124,36 @@ export class IceBoxList extends Component {
       .to(0.1, { scale: v3(0.9, 0.9, 0.9) })
       .to(0.05, { scale: v3(1, 1, 1) })
       .start();
+
     AudioManager.soundPlay("propShow");
   }
 
   initBodyPos() {
     GameGlobal.bodyPosArr = [
-      new Vec3(-1.8, 0.4, -0.6),
-      new Vec3(-1.3, 0.6, -0.5),
-      new Vec3(-1.3, 0.8, -0.5),
-      new Vec3(0.3, 0.9, -0.6),
-      new Vec3(-0.5, 1, 0),
-      new Vec3(0.8, 0.4, -0.1),
-      new Vec3(0.8, 0.6, 0),
-      new Vec3(1.1, 0.8, -0.3),
-      new Vec3(-1.8, 0.7, -1),
+      new Vec3(-1.8, 0.15, -0.6),
+      new Vec3(-1.3, 0.2, -0.5),
+      new Vec3(-1.3, 0.3, -0.5),
+      new Vec3(0.3, 0.25, -0.6),
+      new Vec3(-0.5, 0.35, 0),
+      new Vec3(0.8, 0.15, -0.1),
+      new Vec3(0.8, 0.22, 0),
+      new Vec3(1.1, 0.4, -0.3),
+      new Vec3(-1.8, 0.5, -1),
       new Vec3(1, 0.55, 0.02),
-      new Vec3(-0.5, 0.65, -0.35),
-      new Vec3(0.3, 0.45, 0),
-      new Vec3(1, 0.95, -0.6),
-      new Vec3(0.3, 0.85, -0.3),
-      new Vec3(0.8, 1, -0.48),
-      new Vec3(0.9, 0.75, -0.4),
-      new Vec3(0.7, 0.6, -0.2),
-      new Vec3(0.6, 0.5, -0.55),
-      new Vec3(0.5, 0.5, 0.11),
-      new Vec3(-0.5, 0.7, -0.5),
-      new Vec3(0.9, 0.6, -0.6),
-      new Vec3(-1.8, 0.8, -0.32),
-      new Vec3(-1.3, 0.4, -0.6),
-      new Vec3(0.85, 0.9, -0.6),
+      new Vec3(-0.5, 0.45, -0.35),
+      new Vec3(0.3, 0.3, 0),
+      new Vec3(1, 0.2, -0.6),
+      new Vec3(0.3, 0.25, -0.3),
+      new Vec3(0.8, 0.45, -0.48),
+      new Vec3(0.9, 0.5, -0.4),
+      new Vec3(0.7, 0.3, -0.2),
+      new Vec3(0.6, 0.35, -0.55),
+      new Vec3(0.5, 0.55, 0.11),
+      new Vec3(-0.5, 0.6, -0.5),
+      new Vec3(0.9, 0.24, -0.6),
+      new Vec3(-1.8, 0.32, -0.32),
+      new Vec3(-1.3, 0.22, -0.6),
+      new Vec3(0.85, 0.38, -0.6),
     ];
 
     this.fromPosArr = [new Vec3(-1.2, 0.8, -7), new Vec3(0.23, 0.8, -7), new Vec3(1.3, 0.8, -7)];
@@ -151,53 +175,116 @@ export class IceBoxList extends Component {
     // this.fromPos = new Vec3(0, 0, -1.5);
   }
 
-  onTrggerStart(event) {
-    this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(event.otherCollider, true);
+  onJumpTrggerStart(event) {
+    if (GameGlobal.actor.getCarShowState()) return;
+    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() == 1) {
+      GameGlobal.actor.onJumpButton();
+    }
+    // AudioManager.soundPlay("footTag");
+  }
+  onJumpTrggerExit(event) {
+    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() == 1) {
+      GameGlobal.actor.setSetPlayerY();
+    }
+    // AudioManager.soundPlay("footTag");
+  }
+
+  onTrggerStart() {
+    if (!GameGlobal.actor.getCarShowState()) {
+      if (!this.isTriggerOpen) return;
+    }
+    if (GameGlobal.actor.isHummerIce) return;
+    // this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(true);
+    // AudioManager.soundPlay("footTag");
+    this.onButtonAni();
+  }
+
+  public onButtonAni() {
+    this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(true);
     AudioManager.soundPlay("footTag");
   }
+  // onTrggerStart() {
+  //   this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(true);
+  //   AudioManager.soundPlay("footTag");
+  // }
   onTrggerExit(event) {
-    this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(event.otherCollider, false);
+    if (!GameGlobal.actor.getCarShowState()) {
+      if (!this.isTriggerOpen) return;
+    }
+    this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(false);
+    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() == 1) {
+      GameGlobal.actor.setSetPlayerY();
+    }
   }
-
-  private onTrggerStay(event) {
-    if (this.isFristAni) return;
+  // onTrggerExit() {
+  //   this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(false);
+  //   // let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+  //   // if (body.getGroup() == 1) {
+  //   GameGlobal.actor.setSetPlayerY();
+  //   // }
+  // }
+  public onTrggerStay2(event) {
+    const body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() == 1) {
+      if (!GameGlobal.actor.getCarShowState()) {
+        if (!this.isTriggerOpen) return;
+      }
+    }
     if (GameGlobal.isOver) return;
+    if (GameGlobal.actor.isJump) return;
     if (!GameGlobal.bIceReady) return;
     GameGlobal.bIceReady = false;
-
-    if (this.isFristYD) {
-      this.isFristYD = false;
-      GameGlobal.actor.isWalkStop = true;
-      GameGlobal.actor.stopMove();
-      GameGlobal.actor.onIdle();
-      this.onPlayHummerAni();
-      let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerPosStart");
-      GameGlobal.CameraControl.cameraMove2(
-        muNode,
-        () => {
-          this.scheduleOnce(() => {
-            GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
-              GameGlobal.isFirstStepon = false;
-              GameGlobal.actor.isWalkStop = false;
-            });
-          }, 1);
-        },
-        0.5,
-      );
-    }
-
-    if (GameGlobal.isFirstStepon) return;
-
     this.onPlayHummerAni();
   }
 
+  // public onTrggerStay() {
+  //   if (this.isFristAni) return;
+  //   if (GameGlobal.isOver) return;
+  //   if (GameGlobal.actor.isJump) return;
+  //   if (!GameGlobal.bIceReady) return;
+  //   GameGlobal.bIceReady = false;
+
+  //   if (this.isFristYD) {
+  //     this.isFristYD = false;
+  //     GameGlobal.actor.isWalkStop = true;
+  //     GameGlobal.actor.stopMove();
+  //     GameGlobal.actor.onIdle();
+  //     this.onPlayHummerAni();
+  //     let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerPosStart");
+  //     GameGlobal.CameraControl.cameraMove2(
+  //       muNode,
+  //       () => {
+  //         this.scheduleOnce(() => {
+  //           GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
+  //             GameGlobal.isFirstStepon = false;
+  //             GameGlobal.actor.isWalkStop = false;
+  //           });
+  //         }, 1);
+  //       },
+  //       0.5,
+  //     );
+  //   }
+
+  //   if (GameGlobal.isFirstStepon) return;
+
+  //   this.onPlayHummerAni();
+  // }
+
   onPlayBreak() {
     this.playBreak();
+    if (GameGlobal.YDHummerOpen) {
+      GameGlobal.YDHummerOpen = false;
+    }
   }
 
   onNpcCreate() {
-    if (GameGlobal.curIceNumStage == 1) this.addNpc();
-    else this.addNpc2();
+    // if (GameGlobal.curIceNumStage == 1) this.addNpc();
+    // else if (GameGlobal.curIceNumStage == 2) this.addNpc2();
+    // else this.addNpc2();
+    this.addNpc();
     this.scheduleOnce(() => {
       GameGlobal.curIceNumStage == 1 ? this.nextIceBox() : this.nextIceBox2();
     }, 0.2);
@@ -274,7 +361,7 @@ export class IceBoxList extends Component {
    * @returns
    */
   public addNpc() {
-    if (this.npcCount >= GameGlobal.iceNpcNum) {
+    if (this.npcCount >= 4 * GameGlobal.buyHummerNum) {
       this.npcCount = 0;
       GameGlobal.isBodyReady = true;
       return;
@@ -304,7 +391,7 @@ export class IceBoxList extends Component {
    * @returns
    */
   public addNpc2() {
-    if (this.npcCount >= GameGlobal.iceNpcNum * 3) {
+    if (this.npcCount >= 4 * GameGlobal.buyHummerNum) {
       this.npcCount = 0;
       GameGlobal.isBodyReady = true;
       return;
@@ -326,7 +413,7 @@ export class IceBoxList extends Component {
 
     this.scheduleOnce(() => {
       this.addNpc2();
-    }, 0.002);
+    }, 0.01);
   }
   public getNpcInitPos() {
     let idx = Math.floor(Utils.randomRange(0, 3));
@@ -369,8 +456,6 @@ export class IceBoxList extends Component {
 
   //#region 创建并移动冰块 一个
   public nextIceBox() {
-    // this.addPoolItem(this.iceBoxArr.shift());
-
     //创建一个新冰块
     // if (!GameGlobal.cameraMoving) {
     let newIceBox = this.iceBoxArr.shift(); //this.getPoolItem(); //instantiate(this.iceBox);
@@ -386,16 +471,16 @@ export class IceBoxList extends Component {
     for (let index = 0; index < this.iceBoxArr.length; index++) {
       let iceBox = this.iceBoxArr[index];
       let iceBoxSrc = iceBox.getComponent(IceBox);
-      iceBoxSrc.doMove(this.icePosArr[index], 2, () => {});
+      iceBoxSrc.doMove(this.icePosArr[index], 1.5, () => {});
       this.scheduleOnce(() => {
         GameGlobal.bIceReady = true;
-      }, 2.2);
+      }, 1.6);
     }
   }
 
   //#region 创建并移动冰块 三个
   public nextIceBox2() {
-    let temArr = this.iceBoxArr.splice(0, 3);
+    let temArr = this.iceBoxArr.splice(0, GameGlobal.curIceNumStage);
     // while (temArr.length > 0) {
     //   this.addPoolItem(temArr.shift());
     // }
@@ -405,7 +490,7 @@ export class IceBoxList extends Component {
     for (let i = 0; i < temArr.length; i++) {
       let newIceBox = temArr[i]; //this.getPoolItem(); //instantiate(this.iceBox);
       newIceBox.setParent(this.boxList);
-      newIceBox.setPosition(this.icePosArr[this.iceBoxArr.length + 3]);
+      newIceBox.setPosition(this.icePosArr[this.iceBoxArr.length + GameGlobal.curIceNumStage]);
       newIceBox.getComponent(IceBox).initNpc();
       newIceBox.active = true;
       newIceBox.getChildByName("loader").active = true;
@@ -416,17 +501,22 @@ export class IceBoxList extends Component {
     for (let index = 0; index < this.iceBoxArr.length; index++) {
       let iceBox = this.iceBoxArr[index];
       let iceBoxSrc = iceBox.getComponent(IceBox);
-      iceBoxSrc.doMove(this.icePosArr[index], 6, () => {});
+      iceBoxSrc.doMove(this.icePosArr[index], 1.5 * GameGlobal.curIceNumStage, () => {});
     }
-    this.scheduleOnce(() => {
-      GameGlobal.bIceReady = true;
-    }, 6.2);
+    this.scheduleOnce(
+      () => {
+        GameGlobal.bIceReady = true;
+      },
+      1.5 * GameGlobal.curIceNumStage + 0.1,
+    );
   }
 
   //**锤子特效 参数是几个锤子*/
   public onPlayHummerAni() {
     if (GameGlobal.curIceNumStage == 1) {
       this.animPlay(1);
+    } else if (GameGlobal.curIceNumStage == 2) {
+      this.animPlay(2);
     } else if (GameGlobal.curIceNumStage == 3) {
       this.animPlay(3);
     }
@@ -435,6 +525,9 @@ export class IceBoxList extends Component {
   animPlay(count: number, call?) {
     if (count == 1) {
       this.anim1.play("attack");
+    } else if (count == 2) {
+      this.anim1.play("attack");
+      this.anim2.play("attack");
     } else {
       this.anim1.play("attack");
       this.anim2.play("attack");

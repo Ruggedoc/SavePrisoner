@@ -6,34 +6,48 @@ const { ccclass, property } = _decorator;
 
 @ccclass("ActorAniCrl")
 export class ActorAniCrl extends Component {
-  start() {}
-
-  update(deltaTime: number) {}
-
   onThrowOne() {
+    // AudioManager.audioStop("move");
+    // AudioManager.soundPlay("throwNpc");
     GameGlobal.watarRoom.onThrowBody();
-    AudioManager.soundPlay("throwNpc");
+  }
+  onThrowOneAudio() {
     AudioManager.audioStop("move");
-    // if (GameGlobal.isFirstThrow) {
-    //   let muNode = MainGame.mymain.mainNode
-    //     .getChildByName("GamePos")
-    //     .getChildByName("waterPool1");
-    //   GameGlobal.CameraControl.cameraMoveToPosPingPong(muNode, () => {
-    //     GameGlobal.isFirstThrow = false;
-    //   });
-    // }
+    AudioManager.soundPlay("throwNpc");
   }
 
   onThrowTwo() {
+    // AudioManager.soundPlay("throwNpc");
     GameGlobal.watarRoom.onThrowBody();
+  }
+
+  onThrowTwoAudio() {
     AudioManager.soundPlay("throwNpc");
-    // if (GameGlobal.isFirstThrow) {
-    //   let muNode = MainGame.mymain.mainNode
-    //     .getChildByName("GamePos")
-    //     .getChildByName("waterPool1");
-    //   GameGlobal.CameraControl.cameraMoveToPosPingPong(muNode, () => {
-    //     GameGlobal.isFirstThrow = false;
-    //   });
-    // }
+  }
+
+  public tojump() {
+    GameGlobal.actor.tojump();
+  }
+
+  public tojump2() {
+    GameGlobal.actor.tojump();
+  }
+  public onfootdown() {
+    // GameGlobal.actor.isJump = false;
+    // GameGlobal.iceBoxList.onTrggerStart();
+    // GameGlobal.actor.onJumpFinish();
+    GameGlobal.iceBoxList.onButtonAni();
+  }
+
+  public onjumpdown() {
+    GameGlobal.actor.isJump = false;
+    // GameGlobal.iceBoxList.onTrggerStay();
+    // GameGlobal.actor.onJumpFinish();
+  }
+
+  public onjumpdown2() {
+    // GameGlobal.actor.isJump = false;
+    // GameGlobal.iceBoxList.onTrggerStay();
+    // GameGlobal.actor.onJumpFinish2();
   }
 }

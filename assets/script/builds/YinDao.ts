@@ -6,7 +6,7 @@ const { ccclass, property } = _decorator;
 @ccclass("YinDao")
 export class YinDao extends Component {
   @property(Node)
-  public yd: Node[] = []; //0踩锤子地贴 1拿尸体 2解冻尸体 3柜台拿钱 4野外拿钱
+  public yd: Node[] = []; //0踩锤子按钮 1踩锤子地贴 2解冻尸体 3柜台拿钱 4野外拿钱
 
   public target_YD_Node: Node;
   public initb = false;
@@ -31,6 +31,36 @@ export class YinDao extends Component {
 
   //更新引导目标
   updateYD() {
+    if (GameGlobal.YDHummerOpen) {
+      if (!GameGlobal.YDCarOpen) {
+        this.target_YD_Node = this.yd[1];
+        GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
+        return;
+      } else {
+        GameGlobal.YDHummerOpen = false;
+      }
+    }
+    if (GameGlobal.YDCarOpen) {
+      //捡NPC
+      if (GameGlobal.YDCarOpenState == 0) {
+        if (GameGlobal.iceBoxList.bodyList.children.length > 0) {
+          this.target_YD_Node = GameGlobal.iceBoxList.bodyList.children[0];
+          GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
+          return;
+        } else {
+          //去踩锤子按钮
+          if (GameGlobal.iceBoxList.bodyList.children.length <= 0) {
+            this.target_YD_Node = this.yd[0];
+            GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
+            return;
+          }
+        }
+      } else if (GameGlobal.YDCarOpenState == 1) {
+        this.target_YD_Node = this.yd[2];
+        GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
+        return;
+      }
+    }
     //有钱
     if (GameGlobal.actor.bag2.children.length > 0) {
       if (GameGlobal.nextBuyDitie != null && GameGlobal.nextBuyDitie.active) {
@@ -55,7 +85,7 @@ export class YinDao extends Component {
     if (GameGlobal.equipConter.goldPos.children.length > 0) {
       this.target_YD_Node = this.yd[3];
       let curlen = GameGlobal.equipConter.goldPos.children.length;
-      if (curlen > GameGlobal.moneyConterMax) curlen = GameGlobal.moneyConterMax;
+      if (curlen > GameGlobal.moneyConterMaxY) curlen = GameGlobal.moneyConterMaxY;
       let tray = 1.3 + curlen * 0.1;
       GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node, tray);
       return;
@@ -70,6 +100,11 @@ export class YinDao extends Component {
     }
     //身上带着NPC
     if (GameGlobal.actor.getIsTakeNpc()) {
+      if (!GameGlobal.bOpenPool) {
+        this.yd[2].worldPosition = GameGlobal.mainGame.GamePosNode.getChildByName("YDThrowNpc1").worldPosition.clone();
+      } else {
+        this.yd[2].worldPosition = GameGlobal.mainGame.GamePosNode.getChildByName("YDThrowNpc2").worldPosition.clone();
+      }
       this.target_YD_Node = this.yd[2];
       GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
       return;
@@ -83,7 +118,8 @@ export class YinDao extends Component {
     }
     //去踩锤子按钮
     if (GameGlobal.iceBoxList.bodyList.children.length <= 0) {
-      this.target_YD_Node = this.yd[0];
+      if (GameGlobal.actor.getCarShowState()) this.target_YD_Node = this.yd[0];
+      else this.target_YD_Node = this.yd[1];
       GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
       return;
     }

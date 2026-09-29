@@ -81,14 +81,14 @@
       "mainColor": {
         "__type__": "cc.Color",
         "r": 207,
-        "g": 207,
-        "b": 207,
+        "g": 201,
+        "b": 199,
         "a": 255
       },
       "roughness": 1,
       "specularIntensity": 0,
       "mainTexture": {
-        "__uuid__": "7dd27bbe-fd6e-465d-a434-c02e4891c20c@6c48a",
+        "__uuid__": "6f063018-a62f-48ac-b3c1-6693f2f29776@6c48a",
         "__expectedType__": "cc.Texture2D"
       }
     },

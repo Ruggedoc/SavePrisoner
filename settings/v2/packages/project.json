@@ -10,7 +10,7 @@
   "custom_joint_texture_layouts": [
     {
       "name": "user",
-      "textureLength": 144,
+      "textureLength": 168,
       "contents": [
         {
           "skeleton": "b145f125-c498-4638-bd64-a1dc50da6ae7@30732",
@@ -21,7 +21,9 @@
             "104a2446-c380-4994-b160-9058f1b55302@73b7f",
             "1285e884-8e4b-428e-aa30-cbf4c4ed5584@73b7f",
             "edc6d4c1-9ba6-4501-af55-6d01aba9ec50@73b7f",
-            "005ec34b-30af-495b-9077-8abda08aaa72@73b7f"
+            "005ec34b-30af-495b-9077-8abda08aaa72@73b7f",
+            "69629c25-d72b-4d47-aa70-3df9d38cf84b@73b7f",
+            "669a4fbe-7510-41a3-8cc8-c6ac99ae9caa@73b7f"
           ]
         }
       ]
@@ -119,11 +121,19 @@
       {
         "index": 16,
         "name": "equipCounter"
+      },
+      {
+        "index": 17,
+        "name": "snakeMap"
+      },
+      {
+        "index": 18,
+        "name": "warterAudioMap"
       }
     ],
     "collisionMatrix": {
-      "0": 76262,
-      "1": 521,
+      "0": 469478,
+      "1": 9,
       "2": 1,
       "3": 53314,
       "4": 0,
@@ -131,14 +141,16 @@
       "6": 2057,
       "7": 1,
       "8": 513,
-      "9": 2306,
+      "9": 2304,
       "10": 0,
       "11": 577,
       "12": 8,
       "13": 1,
       "14": 8,
       "15": 8,
-      "16": 1
+      "16": 1,
+      "17": 1,
+      "18": 1
     },
     "maxSubSteps": 1
   },

@@ -49,7 +49,7 @@ export class NpcList extends Component {
     if (!GameGlobal.actor.isattMap) return;
     if (GameGlobal.bHaveNpcDie && this.dieCount < GameGlobal.audioPlayMax) {
       GameGlobal.bHaveNpcDie = false;
-      AudioManager.soundPlay("npcDeath");
+      // AudioManager.soundPlay("npcDeath");
       this.dieCount++;
       this.scheduleOnce(() => {
         this.dieCount--;
@@ -57,10 +57,10 @@ export class NpcList extends Component {
     }
     if (GameGlobal.bHaveNpcAttack && this.attackCount < GameGlobal.audioPlayMax) {
       GameGlobal.bHaveNpcAttack = false;
-      AudioManager.soundPlay("attack");
-      this.dieCount++;
+      // AudioManager.soundPlay("attack");
+      this.attackCount++;
       this.scheduleOnce(() => {
-        this.dieCount--;
+        this.attackCount--;
       }, Math.random() * 2);
     }
   }

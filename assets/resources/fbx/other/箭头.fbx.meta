@@ -106,7 +106,6 @@
         "_techIdx": 0,
         "_defines": [
           {
-            "USE_OUTLINE_PASS": true,
             "USE_INSTANCING": true
           },
           {
@@ -188,9 +187,9 @@
           {
             "baseColor": {
               "__type__": "cc.Color",
-              "r": 0,
-              "g": 56,
-              "b": 139,
+              "r": 71,
+              "g": 255,
+              "b": 0,
               "a": 255
             }
           },
@@ -199,13 +198,13 @@
             "specularIntensity": 0,
             "emissive": {
               "__type__": "cc.Color",
-              "r": 0,
-              "g": 112,
-              "b": 255,
+              "r": 18,
+              "g": 117,
+              "b": 2,
               "a": 255
             },
             "mainTexture": {
-              "__uuid__": "970edf6c-ed2e-41ff-bb77-61cb18f460bf@6c48a",
+              "__uuid__": "dcf25906-5b13-40b5-b330-919b97b99d66@6c48a",
               "__expectedType__": "cc.Texture2D"
             }
           },

@@ -12,7 +12,8 @@
   "_defines": [
     {
       "USE_INSTANCING": true,
-      "USE_ALBEDO_MAP": true
+      "USE_ALBEDO_MAP": true,
+      "ALPHA_TEST_CHANNEL": "r"
     },
     {},
     {},
@@ -68,7 +69,10 @@
   ],
   "_props": [
     {
+      "alphaThreshold": 0.353,
       "roughness": 1,
+      "specularIntensity": 1,
+      "normalStrength": 1.379,
       "mainTexture": {
         "__uuid__": "83748066-ecd8-4f60-9a52-fa7b1f8e66a9@6c48a",
         "__expectedType__": "cc.Texture2D"

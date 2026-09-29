@@ -1,0 +1,96 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "2116b565-0e8f-462c-957a-ca182174355d",
+  "files": [],
+  "subMetas": {
+    "fd609": {
+      "importer": "gltf-mesh",
+      "uuid": "2116b565-0e8f-462c-957a-ca182174355d@fd609",
+      "displayName": "",
+      "id": "fd609",
+      "name": "CleanRoom30.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 38
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "67c1b": {
+      "importer": "gltf-material",
+      "uuid": "2116b565-0e8f-462c-957a-ca182174355d@67c1b",
+      "displayName": "",
+      "id": "67c1b",
+      "name": "CleanRoom__1_.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "2851a": {
+      "importer": "gltf-scene",
+      "uuid": "2116b565-0e8f-462c-957a-ca182174355d@2851a",
+      "displayName": "",
+      "id": "2851a",
+      "name": "CleanRoom30.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "2116b565-0e8f-462c-957a-ca182174355d@fd609"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "2116b565-0e8f-462c-957a-ca182174355d@67c1b"
+      ],
+      "scenes": [
+        "2116b565-0e8f-462c-957a-ca182174355d@2851a"
+      ]
+    }
+  }
+}

@@ -1,9 +1,4 @@
-import {
-  _decorator, Collider,
-  Component,
-  Node,
-  RigidBody, tween, Vec3
-} from "cc";
+import { _decorator, Collider, Component, Node, RigidBody, tween, Vec3 } from "cc";
 
 const { ccclass, property } = _decorator;
 
@@ -17,20 +12,29 @@ export class SaveTrigger extends Component {
   downY: Vec3 = new Vec3(0.047, 0, 0.02);
 
   start() {}
-  public onPlayerFootAni(col: Collider, isEnter: boolean) {
-    let body: RigidBody = col.node.getComponent(RigidBody);
-    if (body.getGroup() == 1) {
-      this.moveToDiTie();
-      tween(this.ball)
-        .to(0.2, { position: isEnter ? this.downY : this.upY })
-        .start();
-    }
+  // public onPlayerFootAni(col: Collider, isEnter: boolean) {
+  //   // let body: RigidBody = col.node.getComponent(RigidBody);
+  //   // if (body.getGroup() == 1) {
+  //   this.moveToDiTie();
+  //   tween(this.ball)
+  //     .to(0.2, { position: isEnter ? this.downY : this.upY })
+  //     .start();
+  //   // }
+  // }
+  public onPlayerFootAni(isEnter: boolean) {
+    // let body: RigidBody = col.node.getComponent(RigidBody);
+    // if (body.getGroup() == 1) {
+    this.moveToDiTie();
+    tween(this.ball)
+      .to(0.1, { position: isEnter ? this.downY : this.upY })
+      .start();
+    // }
   }
 
   moveToDiTie() {
-  //   if (GameGlobal.yindao.ydid == 5) {
-  //     GameGlobal.yindao.ydid = 6;
-  //     GameGlobal.yindao.updateYD();
-  //   }
+    //   if (GameGlobal.yindao.ydid == 5) {
+    //     GameGlobal.yindao.ydid = 6;
+    //     GameGlobal.yindao.updateYD();
+    //   }
   }
 }

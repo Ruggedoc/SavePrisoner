@@ -210,6 +210,6 @@
     }
   },
   "macroConfig": {
-    "ENABLE_WEBGL_ANTIALIAS": false
+    "ENABLE_WEBGL_ANTIALIAS": true
   }
 }

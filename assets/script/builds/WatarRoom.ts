@@ -5,6 +5,7 @@ import { AudioManager } from "../AudioManager";
 import { MainGame } from "../MainGame";
 import { Npc } from "../actor/Npc";
 import { NpcAniState, State_User } from "../EnumDefine";
+import { ShopTrigger } from "./ShopTrigger";
 
 const { ccclass, property } = _decorator;
 
@@ -14,8 +15,30 @@ export class WatarRoom extends Component {
   public YGTrigger: BoxCollider; //浴缸触发器
   @property({ type: BoxCollider, displayName: "浴池触发器" })
   public YCTrigger: BoxCollider; //浴池触发器
+  @property({ type: BoxCollider, displayName: "浴缸进入触发器" })
+  public YGFoot: BoxCollider;
+  @property({ type: BoxCollider, displayName: "浴池进入触发器" })
+  public YCFoot: BoxCollider;
   @property(Node)
   public pan: Node;
+  @property(Node)
+  public throwTriggerNode: Node;
+  @property(Node)
+  public pos2EnterEfc0: Node;
+  @property(Node)
+  public pos2EnterEfc1: Node;
+  @property(Node)
+  public pos6EnterEfc0: Node;
+  @property(Node)
+  public pos6EnterEfc1: Node;
+  @property(Node)
+  public pos6EnterEfc2: Node;
+  @property(Node)
+  public pos6EnterEfc3: Node;
+  @property(Node)
+  public pos6EnterEfc4: Node;
+  @property(Node)
+  public pos6EnterEfc5: Node;
 
   public txNode: Node;
   public max = 150;
@@ -23,7 +46,16 @@ export class WatarRoom extends Component {
   bInTriggerArea: boolean = false;
   /**是否扔完尸体了 */
   bThrowFinish: boolean = true;
+  bThrowing: boolean = false;
   currAnim: string;
+
+  private pos2EfcArr: Node[] = [];
+  private pos6EfcArr: Node[] = [];
+
+  private trgPosYG: Vec3 = v3(-2.291, 0, -0.38);
+  private trgPosYC: Vec3 = v3(-3.275, 0, -0.138);
+  private trgScaleYG: Vec3 = v3(1, 1, 0.7);
+  private trgScaleYC: Vec3 = v3(1.4, 1, 0.98);
   onLoad() {
     GameGlobal.watarRoom = this;
   }
@@ -55,25 +87,56 @@ export class WatarRoom extends Component {
       new Vec3(-3.6, 0, 2.45), //y -90
     ];
 
+    this.pos2EfcArr = [this.pos2EnterEfc0, this.pos2EnterEfc1];
+    this.pos6EfcArr = [
+      this.pos6EnterEfc0,
+      this.pos6EnterEfc1,
+      this.pos6EnterEfc2,
+      this.pos6EnterEfc3,
+      this.pos6EnterEfc4,
+      this.pos6EnterEfc5,
+    ];
+    this.throwTriggerNode.setPosition(this.trgPosYG);
+    this.throwTriggerNode.scale = this.trgScaleYG;
+
     this.YGTrigger.on("onTriggerEnter", this.onThrowTriggerEnter, this);
     this.YGTrigger.on("onTriggerStay", this.onThrowTriggerStay, this);
     this.YGTrigger.on("onTriggerExit", this.onThrowTriggerExit, this);
+    this.YGFoot.on("onTriggerEnter", this.onSelectEnter, this);
+    this.YGFoot.on("onTriggerExit", this.onSelectExit, this);
 
     this.YCTrigger.on("onTriggerEnter", this.onThrowTriggerEnter, this);
     this.YCTrigger.on("onTriggerStay", this.onThrowTriggerStay, this);
     this.YCTrigger.on("onTriggerExit", this.onThrowTriggerExit, this);
+    this.YCFoot.on("onTriggerEnter", this.onSelectEnter, this);
+    this.YCFoot.on("onTriggerExit", this.onSelectExit, this);
+
     this.YGTrigger.enabled = true;
     this.YCTrigger.enabled = false;
+    this.YGFoot.enabled = true;
+    this.YCFoot.enabled = false;
   }
 
   update(deltaTime: number) {}
+  onSelectEnter(event) {
+    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() == 1) {
+      this.throwTriggerNode.getChildByName("select").active = true;
+    }
+  }
+  onSelectExit(event) {
+    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() == 1) {
+      this.throwTriggerNode.getChildByName("select").active = false;
+    }
+  }
 
   private onThrowTriggerEnter(event) {
     let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 1) {
       this.bInTriggerArea = true;
+      // this.throwTriggerNode.getChildByName("select").active = true;
       if (GameGlobal.actor.bNowTakeBody() == null) return;
-
       if (GameGlobal.bOpenPool) {
         if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax2) return;
       } else {
@@ -88,6 +151,7 @@ export class WatarRoom extends Component {
   //#region 扔尸体到水池的触发器
   private onThrowTriggerStay(event) {
     if (GameGlobal.poolAni) return;
+    if (!this.bInTriggerArea) return;
     if (GameGlobal.actor.bNowTakeBody() == null) return;
     if (GameGlobal.isFirstThrow) {
       GameGlobal.isFirstThrow = false;
@@ -107,20 +171,41 @@ export class WatarRoom extends Component {
     } else {
       if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax1) return;
     }
+
+    // if (!this.bThrowing && GameGlobal.bOpenCar) {
+    //   this.bThrowing = true;
+    //   const throwNum = GameGlobal.bOpenPool
+    //     ? GameGlobal.waterOpenMax2 - GameGlobal.curWaterBody
+    //     : GameGlobal.waterOpenMax1 - GameGlobal.curWaterBody;
+    //   const moveTime = Math.min(throwNum, GameGlobal.actor.NpcTakePos.children.length) * 0.2;
+    //   GameGlobal.CameraControl.cameraMoveTotar_actor(
+    //     MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("waterPool1"),
+    //     0.4,
+    //     moveTime,
+    //     0.4,
+    //     () => {
+    //       GameGlobal.cameraMoving = false;
+    //       this.bThrowing = false;
+    //     },
+    //   );
+    // }
+
     this.onPlayThrowAni();
   }
 
   private onThrowTriggerExit(event) {
     let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 1) {
+      // this.throwTriggerNode.getChildByName("select").active = false;
       this.bInTriggerArea = false;
+      this.bThrowFinish = true;
       GameGlobal.actor.isWalkStop = false;
     }
   }
   //#region 扔尸体进池子
   private onPlayThrowAni() {
     //有可能出了检测区，但是延时调用还会继续扔尸体
-    if (!this.bInTriggerArea) return;
+
     if (!this.bThrowFinish) return;
     this.bThrowFinish = false;
     GameGlobal.actor.isWalkStop = true;
@@ -200,28 +285,53 @@ export class WatarRoom extends Component {
         return;
       }
     }
-    
-    let targetPos = this.getThrowTargetPos();
+    if (GameGlobal.YDCarOpen && GameGlobal.YDCarOpenState == 1) {
+      GameGlobal.YDCarOpen = false;
+    }
+
+    let posObject = this.getThrowTargetPos();
+    let targetPos = posObject.pos;
     let worldPos = bodyNode.worldPosition.clone();
     let worldRot = bodyNode.worldRotation.clone();
     let bodySrc = bodyNode.getComponent(Npc);
     bodySrc.curJumpPos = targetPos;
+    bodySrc.inWaterIdx = posObject.index;
+    bodyNode.getChildByName("bodyMod").position = Vec3.UP;
     bodyNode.setParent(this.pan);
     bodyNode.worldPosition = worldPos;
     bodyNode.worldRotation = worldRot;
     let targetRot = this.getThrowTargetRot();
     bodyNode.worldScale = Vec3.ONE;
-    bodySrc.moveToPos(bodyNode, targetPos, 0.35, 0, false, true, targetRot, () => {
-      AudioManager.soundPlay("jumpWater");
-      bodySrc.onPlayDefrostAni(bodyNode, () => {});
-    });
+    bodySrc.moveToPos(
+      bodyNode,
+      targetPos,
+      0.35,
+      0,
+      false,
+      true,
+      targetRot,
+      () => {
+        this.scheduleOnce(() => {
+          bodySrc.onPlayDefrostAni(bodyNode, () => {});
+        }, 0.2);
+      },
+      new Vec3(0, 2.5, 0),
+      0.5,
+      () => {
+        if (GameGlobal.actor.isWarterAduioMap) AudioManager.soundPlay("jumpWater");
+        this.scheduleOnce(() => {
+          this.playWaterEffect(posObject.index);
+        }, 0.25);
+      },
+    );
 
     GameGlobal.curWaterBody++;
     GameGlobal.curTakeBody--;
   }
   //#region 获取扔进池子的落点
-  public getThrowTargetPos(): Vec3 {
+  public getThrowTargetPos(): { pos: Vec3; index: number } {
     let resultPos = new Vec3(0, 0, 0);
+    let resultIndex = 0;
     let targetPosArr: Vec3[] = GameGlobal.bOpenPool ? GameGlobal.inWaterPos6Arr : GameGlobal.inWaterPos2Arr;
     for (let i = 0; i < targetPosArr.length; i++) {
       if (this.pan.children.length > 0) {
@@ -235,14 +345,16 @@ export class WatarRoom extends Component {
         }
         if (!bHave) {
           resultPos = targetPosArr[i];
+          resultIndex = i;
           break;
         }
       } else {
         resultPos = targetPosArr[i];
+        resultIndex = i;
         break;
       }
     }
-    return resultPos;
+    return { pos: resultPos, index: resultIndex };
   }
 
   //#region 获取扔进池子的旋转
@@ -252,6 +364,22 @@ export class WatarRoom extends Component {
     } else {
       return GameGlobal.curWaterBody == 0 ? new Vec3(0, 180, 0) : new Vec3(0, 0, 0);
     }
+  }
+
+  //#region 扔进池子后播放水花特效
+  public playWaterEffect(index: number) {
+    if (GameGlobal.bOpenPool) {
+      this.pos6EfcArr[index].active = true;
+      this.scheduleOnce(() => {
+        this.pos6EfcArr[index].active = false;
+      }, 1);
+    } else {
+      this.pos2EfcArr[index].active = true;
+      this.scheduleOnce(() => {
+        this.pos2EfcArr[index].active = false;
+      }, 1);
+    }
+    // if (GameGlobal.actor.isWarterAduioMap) AudioManager.soundPlay("jumpWater");
   }
 
   public initPos() {
@@ -305,9 +433,14 @@ export class WatarRoom extends Component {
       .to(0.05, { scale: v3(1, 1, 1) })
       .start();
 
+    this.throwTriggerNode.setPosition(this.trgPosYC);
+    this.throwTriggerNode.scale = this.trgScaleYC;
+
     this.scheduleOnce(() => {
       this.YGTrigger.enabled = false;
       this.YCTrigger.enabled = true;
+      this.YGFoot.enabled = false;
+      this.YCFoot.enabled = true;
       if (this.pan.children.length > 0) {
         let rot: Vec3 = new Vec3(0, -90, 0);
         let len = GameGlobal.inWaterPos6Arr.length;

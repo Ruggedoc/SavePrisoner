@@ -15,8 +15,10 @@ export class sprlist extends Component {
 
   public sprMax = 32; //同屏怪物上限
 
+  private waitTimeArr: number[] = [1.5, 2, 2.5, 3];
   private dieCount: number = 0;
   private hitCount: number = 0;
+
   onLoad() {
     GameGlobal.sprlist = this;
   }
@@ -31,6 +33,7 @@ export class sprlist extends Component {
     this.initSpr();
   }
 
+  private timeCount = 0;
   update(dt: number) {
     if (GameGlobal.isOver) {
       return;
@@ -41,10 +44,29 @@ export class sprlist extends Component {
     if (GameGlobal.monsterDeathArr.length > 0) {
       this.addSpr(GameGlobal.monsterDeathArr.shift());
     }
-    this.updateAllMonsterAudio();
+    this.updateAllMonsterAudio(dt);
+
+    this.timeCount += dt;
+    if (this.timeCount >= 3) {
+      this.timeCount = 0;
+      // this.onChckSprState();
+    }
   }
 
-  updateAllMonsterAudio() {
+  private onChckSprState() {
+    for (let i = 0; i < this.node.children.length; i++) {
+      let sprNode = this.node.children[i];
+      if (sprNode != null && sprNode.isValid) {
+        let sprSrc = sprNode.getComponent(Spr);
+        if (sprSrc.targetNode != null && sprSrc.targetNode.isValid == false) {
+          sprSrc.targetNode = null;
+          sprSrc.state = MonsterState.idle;
+        }
+      }
+    }
+  }
+
+  updateAllMonsterAudio(dt: number) {
     if (GameGlobal.isOver || GameGlobal.isStop) return;
     if (!GameGlobal.actor.isattMap) return;
     if (GameGlobal.bHaveMonsterDie && this.dieCount < GameGlobal.audioPlayMax) {
@@ -57,12 +79,28 @@ export class sprlist extends Component {
     }
     if (GameGlobal.bHaveMonsterHit && this.hitCount < GameGlobal.audioPlayMax) {
       GameGlobal.bHaveMonsterHit = false;
-      AudioManager.soundPlay("sprHit");
-      this.dieCount++;
+      // AudioManager.soundPlay("sprHit3");
+      this.hitCount++;
       this.scheduleOnce(() => {
-        this.dieCount--;
+        this.hitCount--;
       }, Math.random() * 2);
     }
+    for (let i = 0; i < this.waitTimeArr.length; i++) {
+      this.waitTimeArr[i] -= dt;
+      if (this.waitTimeArr[i] <= 0) {
+        this.onPlayWaitSound();
+        this.waitTimeArr[i] = Math.random() * 3;
+      }
+    }
+  }
+
+  private onPlayWaitSound() {
+    if (this.hitCount > 0 || this.dieCount > 0) {
+      AudioManager.soundPlay("sprWait", 0.3);
+    } else {
+      AudioManager.soundPlay("sprWait", 1);
+    }
+    //tojump
   }
 
   //初始第一次刷怪
@@ -72,11 +110,12 @@ export class sprlist extends Component {
       let sprSrc = SprNode.getComponent(Spr);
       SprNode.parent = this.node;
       SprNode.worldPosition = GameGlobal.monsterIdlePosArr[i];
-      sprSrc.idlePos = SprNode.worldPosition.clone();
+      sprSrc.idlePos = GameGlobal.monsterIdlePosArr[i];
       sprSrc.init(1);
+      sprSrc.isRandomMove = true;
       // this.scheduleOnce(() => {
       //   sprSrc.state = MonsterState.idle;
-      // }, Math.random());
+      // }, Math.random() * 2);
     }
   }
 
@@ -89,9 +128,9 @@ export class sprlist extends Component {
     sprSrc.idlePos = pos;
     sprSrc.init(1);
     sprSrc.state = MonsterState.idle;
-    this.scheduleOnce(() => {
-      sprSrc.animPlay(StateSpr.move);
-    }, Math.random());
+    // this.scheduleOnce(() => {
+    //   sprSrc.animPlay(StateSpr.move);
+    // }, Math.random());
   }
 
   //获取最近的出生坐标

@@ -10,10 +10,8 @@ import {
   ProgressBar,
   Prefab,
   instantiate,
-  math,
   tween,
   v2,
-  CapsuleCollider,
   RigidBody,
   Collider,
 } from "cc";
@@ -22,12 +20,13 @@ import { MonsterState, NpcFashion, StateSpr } from "../EnumDefine";
 import { Moeny } from "../builds/Moeny";
 import { Npc } from "../actor/Npc";
 import { Utils } from "../Utils";
-import { AudioManager } from "../AudioManager";
 import { DissolveController } from "../actor/DissolveController";
+import { AudioManager } from "../AudioManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("Spr")
 export class Spr extends Component {
+  // ==================== 编辑器属性 ====================
   @property(Prefab)
   hitfab: Prefab;
   @property(ProgressBar)
@@ -42,362 +41,491 @@ export class Spr extends Component {
   findTrigger: Collider;
   @property(Node)
   shaderNod: Node;
+  @property(Node)
+  hitEffect: Node;
+  @property(Node)
+  test: Node;
 
-  anim: SkeletalAnimation;
-  currAnim: string;
-
-  targetPos: Vec3 = new Vec3();
-  tempV3 = new Vec3();
-  targetQuat: Quat;
-  destForward: Vec3 = new Vec3(); //归一化的向量
-  currForward: Vec3 = new Vec3(); //当前方向，归一化的向量
-  tempPos = new Vec3();
-  moveSpeed: number = 6;
-
-  public state = 0; //怪物行为 0移动 1攻击 2死亡
-  /**打我的NPC 目前只有一个 */
+  // ==================== 公开状态（外部访问） ====================
+  public state: MonsterState = MonsterState.idle;
   public attackerNode: Node = null;
-  /**我要打的NPC 目前只有一个 */
-  public targetNode: Node = null; //攻击目标
-  public moveTempPos: Vec3 = new Vec3();
+  public targetNode: Node = null;
   public idlePos: Vec3 = new Vec3(0, 0, 0);
 
   public hp = 0;
   public hpmax = 2;
-  public bjjilv = 40; //暴击几率
-  public propjilv = 100; //道具掉落几率
+  public bjjilv = 40;
+  public propjilv = 100;
 
-  public attNode = null; //攻击的目标，用于闪红
-  public attcdTime = 0; //攻击间隔
+  public attcdTime = 0;
   public attTime = 0;
   public isHit: boolean = false;
   public isDeath: boolean = false;
-  public firstRun: boolean = true;
+  public isDeathClearFinish: boolean = false;
 
+  public moveTempPos: Vec3 = new Vec3();
+
+  public isRandomMove: boolean = false;
+
+  // ==================== 内部状态 ====================
+  private anim: SkeletalAnimation;
+  private currAnim: string;
+  private moveSpeed: number = 6;
+  private hasDeathTriggered: boolean = false;
+  private isHitBack: boolean = false;
+  private isHitEfcShow: boolean = false;
+  private hitTime: number = 0;
+  private hitCd: number = 0.5;
+
+  // 分离避让（避免Spr之间重叠）
+  private readonly SEPARATION_RADIUS = 1.2;
+  private readonly SEPARATION_FORCE = 0.05;
+
+  // 临时向量（复用以减少GC）
+  private tempV3: Vec3 = new Vec3();
+  private tempPos: Vec3 = new Vec3();
+  private targetQuat: Quat;
+  private destForward: Vec3 = new Vec3();
+  private currForward: Vec3 = new Vec3();
+
+  // ==================== 生命周期 ====================
   start() {
     this.bloodBarComp.node.active = false;
     this.targetQuat = new Quat();
-    this.destForward.set(0, 0, 0); //归一化的向量
+    this.destForward.set(0, 0, 0);
     this.currForward.set(0, 0, -1);
     this.anim = this.node.getChildByName("老鼠").getComponent(SkeletalAnimation);
-    this.scheduleOnce(() => {
-      this.animPlay("move");
-    }, Math.random());
+
+    // this.scheduleOnce(() => {
+    //   this.animPlay(StateSpr.move);
+    // }, Math.random() * 2);
 
     this.findTrigger.on("onTriggerEnter", this.onNpcTriggerEnter, this);
     this.findTrigger.on("onTriggerExit", this.onNpcTriggerExit, this);
     this.lookAt(GameGlobal.mainGame.GamePosNode.getChildByName("monsterLookPos").worldPosition.clone());
   }
 
-  onNpcTriggerEnter(self) {
-    if (this.targetNode != null) return;
-    let body: RigidBody = self.otherCollider.node.getComponent(RigidBody);
-    if (body.getGroup() == 2 ** 6) {
-      let npcSrc = body.node.getComponent(Npc);
-      let isParent = false;
-      if (npcSrc == null && body.node.name == "attTrigger") {
-        npcSrc = body.node.parent.getComponent(Npc);
-        isParent = true;
-      }
-      if (npcSrc == null || npcSrc.currShowNpc != NpcFashion.equip || npcSrc.curHp <= 0) return;
-      if (!isParent) {
-        this.targetNode = body.node;
-      } else {
-        this.targetNode = body.node.parent;
-      }
-    }
+  update(dt: number) {
+    if (GameGlobal.isOver) return;
+
+    this.checkTargetsValid();
+    this.processHitDamage(dt);
+    this.processState(dt);
   }
 
-  onNpcTriggerExit(self) {
-    //仇恨范围？
-    let body: RigidBody = self.otherCollider.node.getComponent(RigidBody);
-    if (body.getGroup() == 2 ** 6) {
-      // let npcSrc = null;
-      let npcNode = body.node.parent.parent;
-      if (this.targetNode != null && npcNode.uuid == this.targetNode.uuid) this.targetNode = null;
-      if (this.attackerNode != null && npcNode.uuid == this.attackerNode.uuid) this.attackerNode = null;
-      // npcSrc = body.node.getComponent(Npc);
-      // if (body.node)
-      //   if (npcSrc) {
-      //     this.targetNode = body.node;
-      //   } else {
-      //     if (npcSrc == null && body.node.name == "attTrigger") npcSrc = body.node.parent.getComponent(Npc);
-      //     this.targetNode = body.node.parent;
-      //   }
-    }
-  }
+  // ==================== 公开方法 ====================
 
-  init(max) {
+  init(max: number) {
     this.hpmax = max;
     this.hp = max;
-    // this.bloodBarComp.progress = this.hp / this.hpmax;
-    // this.bloodBarComp.node.active = false;
   }
 
-  update(deltaTime: number) {
-    if (GameGlobal.isOver) {
-      return;
+  /** 外部通过减血来触发死亡 */
+  DelHp(del: number): boolean {
+    if (this.hp <= 0) return true;
+
+    if (del === 1) {
+      const baodian = this.node.getChildByName("baodian2");
+      if (baodian) {
+        baodian.active = true;
+        this.scheduleOnce(() => {
+          if (this.node && this.node.isValid) {
+            const bd = this.node.getChildByName("baodian2");
+            if (bd) bd.active = false;
+          }
+        }, 0.3);
+      }
     }
 
+    this.hp -= del;
+    if (this.hp <= 0) {
+      this.hp = 0;
+      this.state = MonsterState.death;
+      return true;
+    }
+    return false;
+  }
+
+  /** NPC攻击命中本怪物 */
+  onNpcHit(n: Node) {
+    if (this.isHit || this.isHitBack || this.hasDeathTriggered) return;
+
+    this.isHitBack = true;
+    this.attackerNode = n;
+    this.isHit = true;
+
+    this.DelHp(1);
+
+    this.normalMode.active = false;
+    this.redMode.active = true;
+    this.animPlay(StateSpr.hit);
+    if (GameGlobal.actor.isattMap) {
+      AudioManager.soundPlay("sprHit3", 0.5);
+    }
+    this.scheduleOnce(() => {
+      if (this.node && this.node.isValid) {
+        this.normalMode.active = true;
+        this.redMode.active = false;
+      }
+    }, 0.2);
+
+    this.showHitEffect();
+
+    if (this.hasDeathTriggered) return;
+
+    const knockPos = this.calcKnockbackPos(this.attackerNode);
+    if (knockPos) {
+      tween(this.node)
+        .to(0.05, { worldPosition: knockPos })
+        .call(() => {
+          this.isHitBack = false;
+        })
+        .start();
+    } else {
+      this.isHitBack = false;
+    }
+  }
+
+  // ==================== 状态机 ====================
+
+  private processState(dt: number) {
     switch (this.state) {
-      case MonsterState.idle: //待机（跑）
-        this.onIdle(deltaTime);
+      case MonsterState.idle:
+        this.doIdle(dt);
         break;
-      case MonsterState.move: //移动
-        this.toMove(deltaTime);
+      case MonsterState.move:
+        this.doMove(dt);
         break;
-      case MonsterState.attack: //攻击
-        this.ToAtt(deltaTime);
+      case MonsterState.attack:
+        this.doAttack(dt);
         break;
-      case MonsterState.hit: //受击
-        this.onHit(deltaTime);
-        break;
-      case MonsterState.death: //死亡
-        this.onDeath();
+      case MonsterState.death:
+        this.doDeath();
         break;
     }
-    // this.onHit(deltaTime);
   }
 
-  onIdle(dt) {
+  private doIdle(dt: number) {
+    // 已死亡则等待清理完毕
+    if (this.hasDeathTriggered) return;
+
+    // 有攻击者则设为追击目标
+    if (this.attackerNode != null && this.attackerNode.isValid) {
+      const npcSrc = this.attackerNode.getComponent(Npc);
+      if (npcSrc != null && npcSrc.curHp > 0) {
+        this.targetNode = this.attackerNode;
+        this.state = MonsterState.move;
+        return;
+      }
+    }
+
+    // 有目标则追击
     if (this.targetNode != null) {
       this.state = MonsterState.move;
       return;
     }
-    // if (this.firstRun) {
-    //   this.scheduleOnce(() => {
-    //     this.animPlay(StateSpr.move);
-    //   }, Math.random());
-    //   this.firstRun = false;
-    // } else {
-    //   this.animPlay(StateSpr.move);
-    // }
-    let dis: number = Vec3.distance(this.node.worldPosition, this.idlePos);
+
+    // 返回待机位置
+    this.animPlay(StateSpr.move);
+    const dis = Vec3.distance(this.node.worldPosition, this.idlePos);
     if (dis > 0.2) {
-      this.doMove(dt, 0.1, this.idlePos);
+      this.moveToward(dt, 0.1, this.idlePos);
     } else {
       this.node.worldPosition = this.idlePos;
       this.lookAt(GameGlobal.mainGame.GamePosNode.getChildByName("monsterLookPos").worldPosition);
     }
   }
 
-  /**
-   * 攻击
-   */
-  public attColor = false;
-  public ToAtt(dt) {
-    if (this.targetNode == null) {
+  private doMove(dt: number) {
+    if (this.targetNode == null || !this.targetNode.isValid) {
       this.state = MonsterState.idle;
-      this.scheduleOnce(() => {
-        this.animPlay(StateSpr.move);
-      }, Math.random());
       return;
     }
 
-    this.attTime += dt;
-    if (this.attTime > this.attcdTime) {
-      this.attTime = 0;
-      let randomCD = math.random() * 0.5;
-      this.attcdTime = 1 + randomCD;
-
-      this.animPlay(StateSpr.attack, () => {
-        if (this.hp > 0) {
-          this.animPlay(StateSpr.idle);
-        }
-      });
-      if (this.targetNode != null) {
-        if (!this.targetNode.components || this.targetNode.components.length <= 0) {
-          this.targetNode = null;
-          return;
-        }
-        let npcSrc = this.targetNode.getComponent(Npc);
-        if (npcSrc != null && (npcSrc.isDeath || npcSrc.curHp <= 0)) {
-          this.targetNode = null;
-          return;
-        }
-        npcSrc.isHit = true;
-      }
-    }
-  }
-
-  /**
-   * 移动
-   * @param dt
-   * @returns
-   */
-  public toMove(dt) {
-    if (this.targetNode == null) {
+    const npcSrc = this.targetNode.getComponent(Npc);
+    if (npcSrc == null || npcSrc.curHp <= 0) {
+      this.targetNode = null;
+      this.state = MonsterState.idle;
       return;
     }
+
     this.animPlay(StateSpr.move);
 
-    let s = dt * this.moveSpeed;
+    const s = dt * this.moveSpeed;
     Vec3.scaleAndAdd(this.tempPos, this.node.worldPosition, this.currForward, s);
     this.lookAt(this.targetNode.worldPosition);
+    this._applySeparation(this.tempPos);
     this.node.setPosition(this.tempPos);
 
-    this.moveTempPos = new Vec3(this.targetNode.worldPosition.x, 0, this.targetNode.worldPosition.z);
-    let dis = Vec3.distance(this.tempPos, this.moveTempPos);
-    if (dis < 1) {
+    this.moveTempPos.set(this.targetNode.worldPosition.x, 0, this.targetNode.worldPosition.z);
+    const dis = Vec3.distance(this.tempPos, this.moveTempPos);
+    if (dis < 2) {
       this.state = MonsterState.attack;
     }
   }
 
-  hitTime: number = 0;
-  hitCd: number = 1;
-  onHit(dt) {
-    if (!this.isDeath && this.targetNode == null) {
+  private doAttack(dt: number) {
+    if (this.targetNode == null || !this.targetNode.isValid) {
       this.state = MonsterState.idle;
-      this.scheduleOnce(() => {
-        this.animPlay(StateSpr.move);
-      }, Math.random());
       return;
     }
-    if (!this.isHit) return;
+
+    const npcSrc = this.targetNode.getComponent(Npc);
+    if (npcSrc == null || npcSrc.curHp <= 0 || npcSrc.isDeath) {
+      this.targetNode = null;
+      this.state = MonsterState.idle;
+      return;
+    }
+
+    // 目标跑远了，切回追击
+    this.moveTempPos.set(this.targetNode.worldPosition.x, 0, this.targetNode.worldPosition.z);
+    const dis = Vec3.distance(this.node.worldPosition, this.moveTempPos);
+    if (dis > 2) {
+      this.state = MonsterState.move;
+      return;
+    }
+
+    this.attTime += dt;
+    if (this.attTime >= this.attcdTime) {
+      this.attTime = 0;
+      this.attcdTime = 0.5 + Math.random() * 0.5;
+
+      this.animPlay(StateSpr.attack, () => {
+        if (this.hp > 0 && this.state === MonsterState.attack) {
+          this.animPlay(StateSpr.idle);
+        }
+      });
+
+      if (this.targetNode != null && this.targetNode.isValid) {
+        const npc = this.targetNode.getComponent(Npc);
+        if (npc.isHit) return;
+        if (npc != null && npc.curHp > 0 && !npc.isDeath) {
+          npc.isHit = true;
+          npc.applyDamage(1);
+        }
+      }
+    }
+  }
+
+  /** 死亡：只触发一次清理流程 */
+  private doDeath() {
+    if (this.hasDeathTriggered) return;
+    this.hasDeathTriggered = true;
+    this.isDeath = true;
+    this.isHit = false;
+
+    this.spawnProp();
+    this.animPlay(StateSpr.Death, () => {
+      const dissolveCtrl = this.shaderNod.getComponent(DissolveController);
+      dissolveCtrl.initValue();
+      dissolveCtrl.dissolve(3, () => {
+        this.cleanupAndDestroy();
+      });
+    });
+  }
+
+  // ==================== 受击冷却（独立于状态机） ====================
+
+  private processHitDamage(dt: number) {
+    if (!this.isHit || this.hasDeathTriggered) return;
+
     this.hitTime += dt;
     if (this.hitTime < this.hitCd) return;
     this.hitTime = 0;
-    this.hp--;
-    if (this.hp <= 0) {
-      this.state = MonsterState.death;
-      this.isHit = false;
-    }
-  }
-
-  //受击表现
-  onNpcHit(n: Node) {
-    this.attackerNode = n;
-    this.isHit = true;
-    this.state = MonsterState.hit;
-    this.normalMode.active = false;
-    this.redMode.active = true;
-    this.animPlay(StateSpr.hit);
-    this.scheduleOnce(() => {
-      this.normalMode.active = true;
-      this.redMode.active = false;
-    }, 0.2);
-    // AudioManager.soundPlay("sprHit");
-    let tuipos = this.getJiTuiPoint(this.attackerNode);
-    tween(this.node).to(0.05, { worldPosition: tuipos }).start();
-  }
-
-  onDeath() {
-    if (this.hp > 0 || this.isDeath) return;
-    // AudioManager.audioStop("sprHit");
-    this.isDeath = true;
     this.isHit = false;
-    this.animPlay(StateSpr.Death, () => {
-      this.shaderNod.getComponent(DissolveController).initValue();
-      this.shaderNod.getComponent(DissolveController).dissolve(3, () => {
-        if (this.targetNode != null && this.targetNode.components) {
-          let npcSrc = this.targetNode.getComponent(Npc);
-          if (npcSrc != null) {
-            npcSrc.clearTargetByNode(this.targetNode);
-          }
-          this.targetNode = null;
-        }
-        GameGlobal.monsterDeathArr.push(this.idlePos.clone());
-        this.node.destroy();
-      });
-      // tween(this.node)
-      //   .by(1, { position: v3(0, -2, 0) })
-      //   .call(() => {
-      //     if (this.targetNode != null && this.targetNode.components) {
-      //       let npcSrc = this.targetNode.getComponent(Npc);
-      //       if (npcSrc != null) {
-      //         npcSrc.clearTargetByNode(this.targetNode);
-      //       }
-      //       this.targetNode = null;
-      //     }
-      //     GameGlobal.monsterDeathArr.push(this.idlePos.clone());
-      //     this.node.destroy();
-      //   })
-      //   .start();
-    });
-    this.addProp();
   }
 
-  public DelHp(del): boolean {
-    if (this.hp <= 0) {
-      return true;
-    }
+  // ==================== 清理与销毁 ====================
 
-    if (del == 1) {
-      this.node.getChildByName("baodian2").active = true;
-      this.scheduleOnce(() => {
-        this.node.getChildByName("baodian2").active = false;
-      }, 0.3);
+  private cleanupAndDestroy() {
+    if (this.targetNode != null && this.targetNode.isValid) {
+      const npcSrc = this.targetNode.getComponent(Npc);
+      if (npcSrc != null) {
+        npcSrc.clearTargetByNode(this.node);
+      }
     }
+    this.targetNode = null;
+    this.attackerNode = null;
 
-    this.hp -= del;
-    if (this.hp <= 0) {
-      this.state = MonsterState.death;
-      this.addProp();
+    if (this.node && this.node.isValid) {
+      GameGlobal.monsterDeathArr.push(this.idlePos.clone());
+      this.node.removeFromParent();
+      this.node.destroy();
     }
+    this.isDeathClearFinish = true;
   }
 
-  //掉落道具
-  public addProp() {
-    let nowNum = GameGlobal.mainGame.SprListNode.getChildByName("propList").children.length;
-    if (nowNum > 50) {
-      return;
-    }
+  // ==================== 掉落道具 ====================
+
+  private spawnProp() {
+    const propList = GameGlobal.mainGame.SprListNode.getChildByName("propList");
+    if (propList.children.length > GameGlobal.moneySprMaxY) return;
+
     for (let i = 0; i < GameGlobal.killMoney; i++) {
-      let r = Math.sqrt(Math.random() * 3 ** 2);
-      let angle = Math.random() * 2 * Math.PI;
-      let x = r * Math.cos(angle);
-      let z = r * Math.sin(angle);
-      let targetPos = v3(x, 0, z); //目标位置
+      const r = Math.sqrt(Math.random() * 9);
+      const angle = Math.random() * 2 * Math.PI;
+      const x = r * Math.cos(angle);
+      const z = r * Math.sin(angle);
 
-      let propNode = instantiate(this.moneyfab);
-      propNode.parent = this.node;
-      let worldpos = propNode.worldPosition;
-      propNode.parent = GameGlobal.mainGame.SprListNode.getChildByName("propList");
-      propNode.worldPosition = worldpos;
-      let moneySrc = propNode.getComponent(Moeny);
-      targetPos = v3(this.node.worldPosition.x + targetPos.x, 0, this.node.worldPosition.z + targetPos.z);
-      let targetEuler = new Vec3(0, Utils.randomRange(0, 360), 0);
+      const propNode = instantiate(this.moneyfab);
+      const worldPos = this.node.worldPosition.clone();
+      propNode.parent = propList;
+      propNode.worldPosition = worldPos;
+
+      const moneySrc = propNode.getComponent(Moeny);
+      const targetPos = v3(worldPos.x + x, 0, worldPos.z + z);
+      const targetEuler = new Vec3(0, Utils.randomRange(0, 360), 0);
       propNode.eulerAngles = targetEuler;
       moneySrc.moveToPos(true, targetPos, 0.25, new Vec3(0, 2, 0), () => {});
     }
   }
 
-  //#region 被击退
-  public getJiTuiPoint(PlayerNode: Node) {
-    let juli: number = 1.5;
-    let posA = PlayerNode.worldPosition.clone();
-    let posB = this.node.worldPosition.clone();
-    let posAB = v2(posB.x - posA.x, posB.z - posA.z);
-    let unitAB = posAB.normalize();
-    let posC = v3(posB.x + unitAB.x * juli, 0, posB.z + unitAB.y * juli);
-    return posC;
+  // ==================== 受击表现 ====================
+
+  private showHitEffect() {
+    if (!this.isHitEfcShow) {
+      this.isHitEfcShow = true;
+      this.hitEffect.active = true;
+      this.scheduleOnce(() => {
+        if (this.node && this.node.isValid) {
+          this.hitEffect.active = false;
+          this.isHitEfcShow = false;
+        }
+      }, 0.3);
+    }
   }
 
-  animPlay(name: string, call?) {
-    if (this.currAnim == name) {
-      return;
+  // ==================== 击退计算 ====================
+
+  /** 计算击退目标位置，如果后方被其他Spr挡住则返回null表示不击退 */
+  private calcKnockbackPos(playerNode: Node): Vec3 | null {
+    const juli = 1.5;
+    const posA = playerNode.worldPosition;
+    const posB = this.node.worldPosition;
+    const ab = v2(posB.x - posA.x, posB.z - posA.z);
+    const unitAB = ab.normalize();
+    const targetPos = v3(posB.x + unitAB.x * juli, 0, posB.z + unitAB.y * juli);
+
+    if (this._isBlockedByOtherSpr(targetPos)) {
+      return null;
+    }
+    return targetPos;
+  }
+
+  /** 检测目标位置是否被其他Spr占据 */
+  private _isBlockedByOtherSpr(targetPos: Vec3): boolean {
+    const sprListNode = GameGlobal.sprlist?.node;
+    if (!sprListNode) return false;
+
+    const children = sprListNode.children;
+    const blockRadius = this.SEPARATION_RADIUS;
+    const blockRadiusSq = blockRadius * blockRadius;
+
+    for (let i = 0; i < children.length; i++) {
+      const other = children[i];
+      if (other === this.node || !other.isValid) continue;
+      const otherSpr = other.getComponent(Spr);
+      if (!otherSpr || otherSpr.isDeath) continue;
+
+      const dx = targetPos.x - other.worldPosition.x;
+      const dz = targetPos.z - other.worldPosition.z;
+      if (dx * dx + dz * dz < blockRadiusSq) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ==================== 目标有效性检查 ====================
+
+  private checkTargetsValid() {
+    if (this.attackerNode != null) {
+      if (!this.attackerNode.isValid) {
+        this.attackerNode = null;
+      } else {
+        const npcSrc = this.attackerNode.getComponent(Npc);
+        if (npcSrc == null || npcSrc.curHp <= 0) {
+          this.attackerNode = null;
+        } else if (npcSrc.enemyList.indexOf(this.node) === -1) {
+          this.attackerNode = null;
+        }
+      }
+    }
+
+    if (this.targetNode != null) {
+      if (!this.targetNode.isValid) {
+        this.targetNode = null;
+      } else {
+        const npcSrc = this.targetNode.getComponent(Npc);
+        if (npcSrc == null || npcSrc.curHp <= 0) {
+          this.targetNode = null;
+        }
+      }
+    }
+
+    // const dis = Vec3.distance(this.node.worldPosition, this.idlePos);
+    // this.test.active = dis > 1;
+  }
+
+  // ==================== 触发器回调 ====================
+
+  onNpcTriggerEnter(self) {
+    if (this.targetNode != null) return;
+
+    const body: RigidBody = self.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() === 2 ** 6) {
+      let npcSrc = body.node.getComponent(Npc);
+      let isParent = false;
+
+      if (npcSrc == null && body.node.name === "attTrigger") {
+        npcSrc = body.node.parent.getComponent(Npc);
+        isParent = true;
+      }
+
+      if (npcSrc == null || npcSrc.currShowNpc !== NpcFashion.equip || npcSrc.curHp <= 0) return;
+
+      this.targetNode = isParent ? body.node.parent : body.node;
+    }
+  }
+
+  onNpcTriggerExit(self) {
+    const body: RigidBody = self.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() !== 2 ** 6) return;
+
+    const npcNode = body.node.parent?.parent;
+    if (!npcNode) return;
+
+    if (this.targetNode != null && npcNode.uuid === this.targetNode.uuid) {
+      const npcSrc = this.targetNode.getComponent(Npc);
+      if (npcSrc == null || npcSrc.curHp <= 0) {
+        this.targetNode = null;
+      }
+    }
+  }
+
+  // ==================== 动画播放 ====================
+
+  animPlay(name: string, callback?: () => void) {
+    if (this.currAnim === name) return;
+    if (name === "move" && this.isRandomMove) {
+      this.scheduleOnce(() => {
+        this.anim.play(name);
+      }, Math.random() * 2);
+      this.isRandomMove = false;
+    } else {
+      this.anim.play(name);
     }
     this.currAnim = name;
-    this.anim.play(name);
-    if (call) {
-      this.anim.once(
-        Animation.EventType.FINISHED,
-        () => {
-          call();
-        },
-        this,
-      );
+    if (callback) {
+      this.anim.once(Animation.EventType.FINISHED, callback, this);
     }
   }
 
-  /**
-   * @zh
-   * 设置当前节点旋转为面向目标位置，默认前方为 -z 方向
-   * @param pos 目标位置
-   */
+  // ==================== 朝向目标 ====================
+
   lookAt(pos: Vec3) {
-    let a1 = v3(this.node.worldPosition.x, 0, this.node.worldPosition.z);
-    let a2 = v3(pos.x, 0, pos.z);
+    const a1 = v3(this.node.worldPosition.x, 0, this.node.worldPosition.z);
+    const a2 = v3(pos.x, 0, pos.z);
     Vec3.subtract(this.tempV3, a2, a1);
     this.tempV3.normalize();
     Quat.rotationTo(this.targetQuat, GameGlobal.actor.ActorDirection, this.tempV3);
@@ -406,17 +534,53 @@ export class Spr extends Component {
     this.node.setWorldRotation(this.targetQuat);
   }
 
-  //移动
-  public doMove(deltaTime, value, topos, call?) {
-    // this.animPlay(State_User.Move);
-    let s = deltaTime * this.moveSpeed;
+  // ==================== 移动辅助 ====================
+
+  private moveToward(dt: number, threshold: number, target: Vec3, callback?: () => void) {
+    const s = dt * this.moveSpeed;
     Vec3.scaleAndAdd(this.tempPos, this.node.worldPosition, this.currForward, s);
-    this.lookAt(topos);
-    let dis = Vec3.distance(this.tempPos, topos);
-    if (dis < value) {
-      call && call();
+    this.lookAt(target);
+    const dis = Vec3.distance(this.tempPos, target);
+    if (dis < threshold) {
+      callback?.();
       return;
     }
+    this._applySeparation(this.tempPos);
     this.node.setPosition(this.tempPos);
+  }
+
+  /** 与其他Spr保持距离，避免重叠穿模 */
+  private _applySeparation(pos: Vec3): void {
+    const sprListNode = GameGlobal.sprlist?.node;
+    if (!sprListNode) return;
+
+    const children = sprListNode.children;
+    let sepX = 0;
+    let sepZ = 0;
+    let sepCount = 0;
+
+    for (let i = 0; i < children.length; i++) {
+      const other = children[i];
+      if (other === this.node || !other.isValid) continue;
+      const otherSpr = other.getComponent(Spr);
+      if (!otherSpr || otherSpr.isDeath) continue;
+
+      const dx = pos.x - other.worldPosition.x;
+      const dz = pos.z - other.worldPosition.z;
+      const distSq = dx * dx + dz * dz;
+      const radiusSq = this.SEPARATION_RADIUS * this.SEPARATION_RADIUS;
+
+      if (distSq < radiusSq && distSq > 0.0001) {
+        const dist = Math.sqrt(distSq);
+        sepX += dx / dist;
+        sepZ += dz / dist;
+        sepCount++;
+      }
+    }
+
+    if (sepCount > 0) {
+      pos.x += (sepX / sepCount) * this.SEPARATION_FORCE;
+      pos.z += (sepZ / sepCount) * this.SEPARATION_FORCE;
+    }
   }
 }

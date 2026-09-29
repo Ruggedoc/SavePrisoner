@@ -28,10 +28,20 @@ export class Moeny extends Component {
 
   //#region 飞  适合起始点和目标点固定不变的情况
   //普通飞
-  moveToPos(ToUp: boolean, pos: Vec3, delay: number, upVe3: Vec3, callback?, isJelly: boolean = true) {
+  moveToPos(
+    ToUp: boolean,
+    pos: Vec3,
+    delay: number,
+    upVe3: Vec3,
+    callback?,
+    isJelly: boolean = true,
+    rotio: number = 0.8,
+    rotioCallBack?,
+  ) {
     let startPos = this.node.position.clone();
     let tempVec3 = new Vec3(0, 0, 0);
     let controlPos = new Vec3(0, 0, 0);
+    let isRotioRun = false;
     Vec3.add(controlPos, startPos, pos);
     controlPos.multiplyScalar(0.5);
     if (ToUp) {
@@ -50,6 +60,10 @@ export class Moeny extends Component {
           onUpdate: (target, ratio) => {
             Utils.bezierCurve(ratio, this.node.position, controlPos, pos, tempVec3);
             this.node.setPosition(tempVec3);
+            if (!isRotioRun && ratio >= rotio) {
+              rotioCallBack && rotioCallBack();
+              isRotioRun = true;
+            }
           },
         },
       )
@@ -160,7 +174,6 @@ export class Moeny extends Component {
         this.node.setWorldScale(Vec3.ONE);
       });
     }
-    AudioManager.soundPlay("moneyFly");
     this.isready = true;
     this.isMoveb = false;
 

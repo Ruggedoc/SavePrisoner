@@ -70,38 +70,38 @@
         "wrapMode": 1,
         "sample": 30,
         "span": {
-          "from": 0,
+          "from": 0.4,
           "to": 2.7666666507720947
         },
         "events": [
           {
-            "frame": 0.7,
+            "frame": 0.16666666666666666,
             "func": "",
             "params": []
           },
           {
-            "frame": 0.7,
-            "func": "onPlayHummerDown",
+            "frame": 0.16666666666666666,
+            "func": "onPlayIceBreak",
             "params": []
           },
           {
-            "frame": 0.7666666666666667,
+            "frame": 0.2,
             "func": "",
             "params": []
           },
           {
-            "frame": 0.7666666666666667,
+            "frame": 0.2,
             "func": "onHummerDown",
             "params": []
           },
           {
-            "frame": 0.9666666666666667,
+            "frame": 0.4,
             "func": "",
             "params": []
           },
           {
-            "frame": 0.9666666666666667,
-            "func": "onPlayIceBreak",
+            "frame": 0.4,
+            "func": "onPlayHummerDown",
             "params": []
           },
           {
@@ -270,7 +270,7 @@
         "splits": [
           {
             "name": "attack",
-            "from": 0,
+            "from": 0.4,
             "to": 2.7666666507720947,
             "wrapMode": 1,
             "previousId": "73b7f",

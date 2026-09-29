@@ -55,6 +55,10 @@ export class GameGlobal {
    */
   public static moneyConterMaxY: number = 50;
   /**
+   * 野外掉落金币上限
+   */
+  public static moneySprMaxY: number = 80;
+  /**
    * 一个锤子还是三个锤子 1 or 3
    * */
   public static curIceNumStage = 1; //一个锤子还是三个锤子 1 or 3
@@ -71,9 +75,21 @@ export class GameGlobal {
    * */
   public static currencyGold = 0; //金币
   /**
+   * 锤子购买次数上限
+   * */
+  public static buyHummerMaxNum = 2;
+  /**
+   * 锤子购买次数
+   * */
+  public static buyHummerNum = 1;
+  /**
    * 买多个锤子的花费
    * */
-  public static buyIceNumMoney = 20; //买多个锤子的花费
+  public static buyHummerMoney1 = 20; //买多个锤子的花费
+  /**
+   * 买多个锤子的花费
+   * */
+  public static buyHummerMoney2 = 40; //买多个锤子的花费
   /**
    * 买推车的花费
    * */
@@ -89,7 +105,7 @@ export class GameGlobal {
   /**
    * 买新区域的花费
    * */
-  public static buyNewMapMoney = 200; //买新区域的花费
+  public static buyNewMapMoney = 150; //买新区域的花费
   /**
    * 解冻一个人奖励的金币数
    * */
@@ -97,7 +113,7 @@ export class GameGlobal {
   /**
    * 小怪奖励的金币数
    * */
-  public static killMoney = 6; //小怪奖励的金币数
+  public static killMoney = 12; //小怪奖励的金币数
   /**
    * 冰块是否准备好了
    * */
@@ -105,11 +121,11 @@ export class GameGlobal {
   /**
    * 解冻的尸体上限
    * */
-  public static saveMaxNum: number = 24;
+  public static saveMaxNum: number = 16;
   /**
    * 每块冰尸体上限
    * */
-  public static iceNpcNum: number = 8;
+  public static iceNpcNum: number = 4;
   /**
    * 当前携带尸体
    */
@@ -133,11 +149,11 @@ export class GameGlobal {
   /**
    * 背包三尸体坐标
    */
-  public static curTakeBodyPos1: Vec3 = new Vec3(-0.087, 0.72, -1.3);
+  public static curTakeBodyPos1: Vec3 = new Vec3(-0.05, 0.72, -0.3);
   /**
    * 背包三尸体坐标
    */
-  public static curTakeBodyPos2: Vec3 = new Vec3(0.087, 0.72, -1.3);
+  public static curTakeBodyPos2: Vec3 = new Vec3(0.087, 0.72, -0.3);
   /**
    * 背包四尸体旋转
    */
@@ -301,4 +317,10 @@ export class GameGlobal {
 
   public static audioPlayMax: number = 2;
   public static audioPlayInterval: number = 1;
+  //锤子解锁强制引导去踩一次
+  public static YDHummerOpen: boolean = false;
+  //车解锁强制引导去装一次尸体
+  public static YDCarOpen: boolean = false;
+  //车解锁强制引导去装一次尸体
+  public static YDCarOpenState: number = 0;
 }

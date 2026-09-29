@@ -6,6 +6,7 @@ const { ccclass, property } = _decorator;
 @ccclass("sprDeethAudio")
 export class sprDeethAudio extends Component {
   onDeathAudio() {
+    if (!GameGlobal.actor.isattMap) return;
     GameGlobal.bHaveMonsterDie = true;
   }
 }

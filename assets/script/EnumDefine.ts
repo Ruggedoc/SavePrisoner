@@ -11,6 +11,8 @@ export enum State_User {
   carStand = "carIdle",
   carMove = "carMove",
   throw = "throw",
+  Jump = "jump",
+  Jump2 = "jump2",
 }
 
 export enum NpcAniState {

@@ -15,6 +15,7 @@ import {
   ProgressBar,
   UIOpacity,
   Collider,
+  Widget,
 } from "cc";
 import { GameGlobal } from "./GameGlobal";
 import { AudioManager } from "./AudioManager";
@@ -39,19 +40,22 @@ export class MainGame extends Component {
   @property(Node)
   coinNode: Node;
   @property(Node)
-  endCardNode: Node;
-  @property(Node)
   tiShiShou: Node;
-  @property(Node)
-  hpNode: Node;
   @property(Node)
   SprListNode: Node;
   @property(Node)
-  KJMapNode: Node;
-  @property(Node)
   GameOverUI: Node;
+  @property(Node)
+  endBuiding: Node;
+  @property(Node)
+  endBuiding2: Node;
   @property(Collider)
   groundCollider: Collider;
+  @property(Node)
+  topLeftUI: Node;
+
+  @property({ type: Boolean, displayName: "是否开启车开启后的动画" })
+  isOpenCarAni: boolean = false;
 
   Pole: Node = null;
   Dish: Node = null;
@@ -119,7 +123,10 @@ export class MainGame extends Component {
     //     | EPhysicsDrawFlags.CONSTRAINT;
 
     // GameGlobal.cameraMoving = true;
-
+    this.tiShiShou.active = true;
+    this.onSetUIState();
+    // screen.on("orientation-change", this.onOrientationChange, this);
+    view.on("canvas-resize", this.onSetUIState, this); //系统监听屏幕变化
   }
   // public index = 0;
   // public buildlist: Node[] = [];
@@ -132,6 +139,33 @@ export class MainGame extends Component {
   //     this.index++;
   // }
 
+  public onOrientationChange() {
+    this.onSetUIState();
+  }
+
+  //#region 横竖屏适配
+  public onSetUIState() {
+    if (screen.windowSize.height > screen.windowSize.width && screen.windowSize.width / screen.windowSize.height < 1) {
+      //竖屏
+      this.topLeftUI.scale = Vec3.ONE;
+      this.coinNode.scale = Vec3.ONE;
+
+      // this.tiShiShou.getComponent(Widget).right = screen.windowSize.width / 2 + 50;
+      this.JoyStick.setScale(Vec3.ONE);
+      this.tiShiShou.setScale(Vec3.ONE);
+      this.tiShiShou.getComponent(Widget).verticalCenter = -250;
+      this.tiShiShou.getComponent(Widget).updateAlignment();
+    } else {
+      //横屏
+      this.topLeftUI.scale = new Vec3(2.5, 2.5, 2.5);
+      this.coinNode.scale = new Vec3(2.2, 2.2, 2.2);
+      this.tiShiShou.setScale(new Vec3(1.2, 1.2, 1.2));
+      this.JoyStick.setScale(new Vec3(1.2, 1.2, 1.2));
+      this.tiShiShou.getComponent(Widget).horizontalCenter = 800;
+      this.tiShiShou.getComponent(Widget).verticalCenter = 0;
+      this.tiShiShou.getComponent(Widget).updateAlignment();
+    }
+  }
 
   public updateMoney() {
     let baglength = GameGlobal.actor.bag2.children.length;
@@ -140,16 +174,6 @@ export class MainGame extends Component {
     //     this.mymoney = 0;
     // }
     this.coinNode.getChildByName("labCoin").getComponent(Label).string = "" + baglength * GameGlobal.iconValue;
-  }
-
-  public updateqiangHP() {
-    let delhp = 2;
-    this.qianghpNow = this.qianghpNow - delhp;
-    let value = this.qianghpNow / this.qianghpMax;
-    if (value < 0.05) {
-      value = 0.05;
-    }
-    this.hpNode.getComponent(ProgressBar).progress = value;
   }
 
   public addKuojian() {
@@ -198,16 +222,31 @@ export class MainGame extends Component {
     // BuyerManager2.changeScale();
   }
 
+  public testTime = 1;
+  public testTimeCount = 0;
+  audioTag = 0;
   update(deltaTime: number) {
     if (GameGlobal.cameraMoving) {
       this.tiShiTimer = 0;
       return;
     }
+    // this.testTimeCount += deltaTime;
+    // if (this.testTimeCount >= this.testTime) {
+    //   this.testTimeCount = 0;
+    //   if (this.audioTag == 0) {
+    //     this.audioTag = 1;
+    //     AudioManager.soundPlay("attack");
+    //   } else {
+    //     this.audioTag = 0;
+    //     AudioManager.soundPlay("sprHit3");
+    //   }
+    // }
 
     if (this.isTiShi) {
       this.tiShiTimer += deltaTime;
       if (this.tiShiTimer >= 3) {
         this.tiShiShou.active = true;
+        // this.onSetUIState();
       }
     }
   }
@@ -278,17 +317,26 @@ export class MainGame extends Component {
     GameGlobal.state = state;
   }
 
-  onShowGameOver() {
-    this.GameOverUI.active = true;
-    tween(this.GameOverUI)
-      .to(0.2, { scale: new Vec3(1.2, 1.2, 1.2) })
-      .to(0.2, { scale: new Vec3(1, 1, 1) })
-      .delay(2)
-      .start();
-    tween(this.GameOverUI.getComponent(UIOpacity)).to(0.2, { opacity: 255 }).start();
+  onShowGameOver(callback?) {
+    this.endBuiding.active = true;
+    this.endBuiding2.active = false;
+    AudioManager.soundPlay("propShow");
+    this.scheduleOnce(() => {
+      this.GameOverUI.active = true;
+      tween(this.GameOverUI)
+        .to(0.2, { scale: new Vec3(1.2, 1.2, 1.2) })
+        .to(0.2, { scale: new Vec3(1, 1, 1) })
+        .call(() => {
+          if (callback != null) callback();
+        })
+        .start();
+      tween(this.GameOverUI.getComponent(UIOpacity)).to(0.2, { opacity: 255 }).start();
+    }, 0.5);
   }
 
   //#region 检查有没有浴巾囚犯
+  
+
   getNpcByType() {
     let npcArr = this.SprListNode.getChildByName("npcList").children;
     if (npcArr.length > 0) {

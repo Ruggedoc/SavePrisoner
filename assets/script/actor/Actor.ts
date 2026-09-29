@@ -4,7 +4,6 @@ import { ShopTrigger } from "../builds/ShopTrigger";
 import { NpcAniState, State_User } from "../EnumDefine";
 import { GameGlobal } from "../GameGlobal";
 import { MainGame } from "../MainGame";
-import { Spr } from "../sprite/Spr";
 import { Utils } from "../Utils";
 import { FMPlayer } from "./FMPlayer";
 import { Npc } from "./Npc";
@@ -25,18 +24,9 @@ import {
   Animation,
   ICollisionEvent,
   BoxCollider,
-  Line,
-  Graphics,
-  v3,
-  PhysicsSystem,
   CapsuleCollider,
-  SphereCollider,
-  geometry,
-  physics,
-  math,
+  v3,
 } from "cc";
-import { PlayerController } from "./PlayerController";
-import { ActorFlyAttribute } from "./ActorFlyAttribute";
 const { ccclass, property } = _decorator;
 
 const bag3MovePos: Vec3 = new Vec3();
@@ -127,6 +117,8 @@ export class Actor extends Component {
   public attDie = 2; //攻击距离
   public isattMap = false; //是否进入战斗区域
   public isConter = false; //是否进入柜台金币区
+  public issnakeMap = false; //是否进入震屏区域
+  public isWarterAduioMap = false; //是否进入水池声音区域
 
   isYanMoing: boolean = false; //是否正在研磨中
   isShouMoneying: boolean = false; //是否正在收集金币中
@@ -153,6 +145,12 @@ export class Actor extends Component {
   controllEnable = true;
   inCollisionColliders: Set<Collider> = new Set();
   groundCollider: null;
+  isHummerIce: boolean = false;
+  isJump: boolean = false;
+  isFirstJump: boolean = true;
+
+  monsySoundCount: number = 3;
+  battleMoneyCount: number = 0;
 
   onLoad() {
     GameGlobal.actor = this;
@@ -178,20 +176,20 @@ export class Actor extends Component {
     this.anim = this.animNode.getComponent(SkeletalAnimation);
 
     this.carBodyPosArr = [
-      new Vec3(-0.95, -0.018, -0.95),
-      new Vec3(-1, 0.2, -0.4),
-      new Vec3(-1, 0.03, -0.3),
-      new Vec3(0.6, 0.5, 0),
-      new Vec3(0.66, 0.085, -0.18),
-      new Vec3(0.8, -0.04, 0.82),
+      new Vec3(0.09, 0, 0.5),
+      new Vec3(-0.385, 0.014, 0.5),
+      new Vec3(0.27, 0.347, 0.55),
+      new Vec3(-0.21, 0.255, 0.6),
+      new Vec3(0.278, 0.61, 0.62),
+      new Vec3(-0.444, 0.415, 0.6),
     ];
     this.carBodyRotArr = [
-      new Vec3(90, 90, 0),
-      new Vec3(90, 110, 45),
-      new Vec3(90, 70, 155),
-      new Vec3(117, -49, -49),
-      new Vec3(-80, 90, 0),
-      new Vec3(90, -90, 0),
+      new Vec3(-90, 0, 90),
+      new Vec3(-90, 0, 45),
+      new Vec3(-90, 0, 180),
+      new Vec3(-90, 0, 0),
+      new Vec3(-90, 10, 60),
+      new Vec3(-90, 0, 200),
     ];
 
     this.TreetargetQuat = new Quat();
@@ -267,7 +265,7 @@ export class Actor extends Component {
         if (this.carNode.active) {
           aniType = State_User.carMove;
         } else {
-          if (this.bag3.children.length > 0 || this.bag4.children.length > 0) aniType = State_User.BaoMove;
+          if (this.getIsTakeNpc2()) aniType = State_User.BaoMove;
           else aniType = State_User.Move;
         }
         this.animPlay(aniType);
@@ -275,6 +273,116 @@ export class Actor extends Component {
       if (GameGlobal.FMPlayer != null && GameGlobal.FMPlayer.isYDNpcMove) return;
       GameGlobal.CameraControl.cameraFollow();
     }
+  }
+
+  //#region 播放跳跃踩按钮
+  onJumpButton() {
+    if (this.isHummerIce) return;
+    GameGlobal.mainGame.stopjoy();
+    this.isHummerIce = true;
+    this.isJump = true;
+    this.issnakeMap = true;
+    this.onChangeHummerCollider(false);
+
+    let targetPos = GameGlobal.iceBoxList.saveTrigger.worldPosition.clone();
+    this.lookAt(targetPos);
+    if (this.getIsTakeNpc2()) {
+      this.animPlay(State_User.Jump2);
+    } else {
+      this.animPlay(State_User.Jump, () => {
+        this.onJumpFinish();
+        // GameGlobal.iceBoxList.onTrggerStay();
+      });
+    }
+    if (this.isFirstJump) {
+      let hummerPos = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPosStart");
+      GameGlobal.CameraControl.cameraMove2(hummerPos, null, 0.5);
+    }
+  }
+
+  public onJumpFinish() {
+    let movePos = GameGlobal.mainGame.GamePosNode.getChildByName("jumpOverPos").worldPosition.clone();
+    let lookPos = new Vec3(movePos.x, 0.35, movePos.z);
+    this.turnToTarget(lookPos);
+    this.scheduleOnce(() => {
+      this.animPlay(State_User.Move);
+      this.moveToPos(movePos, 0.3, false, () => {
+        this.isHummerIce = false;
+        GameGlobal.iceBoxList.isTriggerOpen = false;
+        this.animPlay(State_User.Idle);
+        this.onChangeHummerCollider(true);
+      });
+    }, 0.3);
+
+    this.scheduleOnce(() => {
+      GameGlobal.CameraControl.cameraShock(false);
+    }, 0.2);
+
+    if (this.isFirstJump) {
+      this.scheduleOnce(() => {
+        GameGlobal.CameraControl.cameraMoveToActor(0.4);
+        this.isFirstJump = false;
+      }, 1);
+    }
+  }
+
+  public onJumpFinish2() {
+    let targetPos = GameGlobal.mainGame.GamePosNode.getChildByName("jumpOverPos").worldPosition.clone();
+    this.turnToTarget(targetPos);
+    this.scheduleOnce(() => {
+      this.animPlay(State_User.BaoMove);
+      this.moveToPos(targetPos, 0.45, false, () => {
+        this.isHummerIce = false;
+        GameGlobal.iceBoxList.isTriggerOpen = false;
+        this.animPlay(State_User.BaoIdle);
+        this.onChangeHummerCollider(false);
+      });
+    }, 0.15);
+    // this.scheduleOnce(() => {
+    //   GameGlobal.CameraControl.cameraMoveToActor(0.4);
+    // }, 0.7);
+  }
+
+  public turnTempQuat: Quat = new Quat();
+  public turnTime: number = 0.15;
+
+  //#region 转向目标点
+  turnToTarget(targetPos: Vec3) {
+    let formQuat = new Quat();
+    let toQuat = new Quat();
+    Quat.copy(formQuat, this.node.rotation.clone());
+
+    // 终点旋转：让 -Z 指向目标
+    const dir = new Vec3();
+    Vec3.subtract(dir, targetPos, this.node.worldPosition);
+    if (dir.lengthSqr() < 1e-6) return;
+    dir.normalize();
+    Quat.fromViewUp(toQuat, dir, Vec3.UP);
+
+    const progress = { t: 0 };
+    tween(progress)
+      .to(
+        this.turnTime,
+        { t: 1 },
+        {
+          onUpdate: () => {
+            Quat.slerp(this.turnTempQuat, formQuat, toQuat, progress.t);
+            this.node.setRotation(this.turnTempQuat);
+          },
+        },
+      )
+      .start();
+  }
+
+  public tojump() {
+    let tempPos = GameGlobal.iceBoxList.saveTrigger.worldPosition.clone();
+    let targetPos = new Vec3(tempPos.x, 0.35, tempPos.z + 0.3);
+    this.moveToPos2(targetPos, 0.4);
+    // this.moveToPos_jump3(targetPos, GameGlobal.mainGame.GamePosNode.getChildByName("jumpTopPos").worldPosition.clone());
+  }
+
+  public setSetPlayerY() {
+    this.node.setPosition(this.node.worldPosition.x, 0, this.node.worldPosition.z);
   }
 
   //#region 移动
@@ -287,7 +395,7 @@ export class Actor extends Component {
       this.onChangeBodyBagPos();
       return;
     }
-    if (GameGlobal.cameraMoving || this.isWalkStop) {
+    if (GameGlobal.cameraMoving || this.isWalkStop || this.isHummerIce) {
       this.isMoving = false;
       this.userRigidBody.setLinearVelocity(Vec3.ZERO);
       this.clearAngularVelocity();
@@ -368,9 +476,14 @@ export class Actor extends Component {
 
   //#region 触发监听
   onTriggerEnter(self) {
+    if (this.isHummerIce) return;
     let body: RigidBody = self.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 8192) {
       this.isattMap = true;
+    } else if (body.getGroup() == 2 ** 17) {
+      this.issnakeMap = true;
+    } else if (body.getGroup() == 2 ** 18) {
+      this.isWarterAduioMap = true;
     } else if (body.getGroup() == 2 ** 6 && self.otherCollider.node.name == "pz_d") {
       //捡尸体
       this.isShouMuing = true;
@@ -381,12 +494,17 @@ export class Actor extends Component {
   }
 
   onTriggerStay(self) {
+    if (this.isHummerIce) return;
     let body: RigidBody = self.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 8192) {
       this.isattMap = true;
+    } else if (body.getGroup() == 2 ** 17) {
+      this.issnakeMap = true;
     } else if (body.getGroup() == 2 ** 16) {
       this.isCollectMoney = true;
       this.MoveMoneyToBag2();
+    } else if (body.getGroup() == 2 ** 18) {
+      this.isWarterAduioMap = true;
     }
   }
 
@@ -394,8 +512,16 @@ export class Actor extends Component {
     let body: RigidBody = self.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 8192) {
       this.isattMap = false;
+      GameGlobal.bHaveMonsterDie = false;
+      GameGlobal.bHaveMonsterHit = false;
+      GameGlobal.bHaveNpcDie = false;
+      GameGlobal.bHaveNpcAttack = false;
+    } else if (body.getGroup() == 2 ** 17) {
+      this.issnakeMap = false;
     } else if (body.getGroup() == 2 ** 16) {
       this.isCollectMoney = false;
+    } else if (body.getGroup() == 2 ** 18) {
+      this.isWarterAduioMap = false;
     }
   }
 
@@ -405,7 +531,7 @@ export class Actor extends Component {
       bag3MovePos.set(
         GameGlobal.curTakeBodyPos1.x,
         GameGlobal.curTakeBodyPos1.y,
-        this.isMoving ? -1.1 : GameGlobal.curTakeBodyPos1.z,
+        this.isMoving ? -0.1 : GameGlobal.curTakeBodyPos1.z,
       );
       this.bag3.children[0].setPosition(bag3MovePos);
     }
@@ -413,7 +539,7 @@ export class Actor extends Component {
       bag4MovePos.set(
         GameGlobal.curTakeBodyPos2.x,
         GameGlobal.curTakeBodyPos2.y,
-        this.isMoving ? -1.1 : GameGlobal.curTakeBodyPos2.z,
+        this.isMoving ? -0.1 : GameGlobal.curTakeBodyPos2.z,
       );
       this.bag4.children[0].setPosition(bag4MovePos);
     }
@@ -485,6 +611,9 @@ export class Actor extends Component {
     if (GameGlobal.bOpenCar) {
       GameGlobal.actor.onChangeCarState(true);
       this.onTakeBodyMuch(body);
+      if (GameGlobal.YDCarOpen) {
+        GameGlobal.YDCarOpenState = 1;
+      }
     } else {
       this.onTakeBodySingle(body);
     }
@@ -504,28 +633,20 @@ export class Actor extends Component {
     GameGlobal.curTakeBody++;
     muSrc.isready = false;
     AudioManager.soundPlay("takeIceNpc", 0.2);
-    let worldPos = body.worldPosition.clone();
+    let oldPos = body.worldPosition.clone();
+    let oldRot = body.worldRotation.clone();
+    body.setScale(Vec3.ONE);
+    body.getChildByName("bodyMod").position = Vec3.ZERO;
     body.setParent(takPosNode);
-    GameGlobal.iceBoxList.onSetPosIdx(body.position);
-    body.worldPosition = worldPos;
-    body.worldScale = Vec3.ONE;
+    body.setWorldPosition(oldPos);
+    body.setRotation(oldRot);
     muSrc.animPlay(NpcAniState.ice2);
 
+    muSrc.moveToPos2(body, takePosVe3, 0.3, takeRotVe3, () => {
+      this.cleanBag();
+    });
+
     this.animPlay(State_User.BaoIdle);
-    let midPos = Vec3.ZERO;
-    muSrc.moveToPos(
-      body,
-      takePosVe3,
-      0.3,
-      0,
-      false,
-      true,
-      takeRotVe3,
-      () => {
-        this.cleanBag();
-      },
-      midPos,
-    );
     this.checkBagPos();
   }
 
@@ -559,8 +680,8 @@ export class Actor extends Component {
     this.checkBagPos();
   }
 
-  //#region 开启手推车,捡尸体的时候
-  onChangeCarState(isOpen: boolean) {
+  //#region 改变手推车状态,捡尸体的时候
+  onChangeCarState(isOpen: boolean, callBack?) {
     this.carNode.active = isOpen;
     // this.UserCollider.center = isOpen ? this.userColliderCenter2 : this.userColliderCenter1;
     // this.UserCollider.size = isOpen ? this.userColliderSize2 : this.userColliderSize1;
@@ -570,12 +691,25 @@ export class Actor extends Component {
       this.carEfcNode.active = true;
       this.scheduleOnce(() => {
         this.carEfcNode.active = false;
+        callBack && callBack();
       }, 1);
       this.onBagNpcPosChange();
+      GameGlobal.iceBoxList.isTriggerOpen = true;
+      GameGlobal.isFirstThrow = true;
     }
     this.carCollider.enabled = isOpen;
     this.carCollider.isTrigger = !isOpen;
     this.carTrigger.node.active = isOpen;
+    this.onChangeHummerCollider(!isOpen && !this.getIsTakeNpc2());
+  }
+
+  public onChangeHummerCollider(isOpen: boolean) {
+    GameGlobal.iceBoxList.saveTrigger.getChildByName("jumpPZ").active = isOpen;
+  }
+
+  //#region 获取手推车显示状态
+  public getCarShowState(): boolean {
+    return this.carNode.active;
   }
 
   private onBagNpcPosChange() {
@@ -584,6 +718,7 @@ export class Actor extends Component {
       let targetLocalPos = this.carBodyPosArr[this.NpcTakePos.children.length];
       let targetLocalRot = this.carBodyRotArr[this.NpcTakePos.children.length];
 
+      npcNode.getChildByName("bodyMod").position = Vec3.UP;
       npcNode.setParent(this.NpcTakePos);
       npcNode.position = targetLocalPos;
       npcNode.eulerAngles = targetLocalRot;
@@ -593,6 +728,7 @@ export class Actor extends Component {
       let targetLocalPos = this.carBodyPosArr[this.NpcTakePos.children.length];
       let targetLocalRot = this.carBodyRotArr[this.NpcTakePos.children.length];
 
+      npcNode.getChildByName("bodyMod").position = Vec3.UP;
       npcNode.setParent(this.NpcTakePos);
       npcNode.position = targetLocalPos;
       npcNode.eulerAngles = targetLocalRot;
@@ -692,6 +828,11 @@ export class Actor extends Component {
     this.time1 = 0;
     let moneyNode = this.getNearMoney();
     if (moneyNode == null) return;
+    this.battleMoneyCount++;
+    if (this.battleMoneyCount >= this.monsySoundCount) {
+      this.battleMoneyCount = 0;
+      AudioManager.soundPlay("moneyFly");
+    }
 
     let moneySrc = moneyNode.getComponent(Moeny);
     if (moneySrc) {
@@ -705,10 +846,28 @@ export class Actor extends Component {
         moneySrc.isMoveb = true;
         moneySrc.isready = false;
         moneySrc.onSetMoveParms(3, 3, false);
-
-        return;
       }
     }
+
+    let moneyNode2 = this.getNearMoney();
+    if (moneyNode2 == null) return;
+
+    let moneySrc2 = moneyNode2.getComponent(Moeny);
+    if (moneySrc2) {
+      if (moneySrc2.isready && !moneySrc2.isMoveb) {
+        if (GameGlobal.moneyBagMax - (GameGlobal.curFlyCoin.length + this.bag2.children.length) <= 0) {
+          this.cleanBag();
+          return;
+        }
+
+        if (GameGlobal.curFlyCoin.indexOf(moneyNode2) == -1) GameGlobal.curFlyCoin.push(moneyNode2);
+        moneySrc2.isMoveb = true;
+        moneySrc2.isready = false;
+        moneySrc2.onSetMoveParms(3, 3, false);
+      }
+    }
+
+    // AudioManager.soundPlay("moneyFly");
   }
 
   private getNearMoney(): Node {
@@ -744,6 +903,9 @@ export class Actor extends Component {
   }
 
   stopMove() {
+    if (this.isHummerIce) {
+      return;
+    }
     AudioManager.audioStop("move");
     this.isuserMove = false;
     this.userdir = Vec3.ZERO;
@@ -760,7 +922,7 @@ export class Actor extends Component {
     if (this.carNode.active) {
       aniType = State_User.carStand;
     } else {
-      if (this.bag3.children.length > 0 || this.bag4.children.length > 0) aniType = State_User.BaoIdle;
+      if (this.getIsTakeNpc2()) aniType = State_User.BaoIdle;
       else aniType = State_User.Idle;
     }
     this.animPlay(aniType);
@@ -862,8 +1024,161 @@ export class Actor extends Component {
     this.node.setWorldRotation(this.targetQuat);
   }
 
-  //#region 获取玩家有没有带着NPC
+  //#region 获取玩家有没有带着NPC抱着或者小车装着
   getIsTakeNpc() {
     return this.bag3.children.length > 0 || this.bag4.children.length > 0 || this.NpcTakePos.children.length > 0;
+  }
+
+  //#region 获取玩家有没有带着NPC 抱着
+  getIsTakeNpc2() {
+    return this.bag3.children.length > 0 || this.bag4.children.length > 0;
+  }
+
+  //#region 飞  适合起始点和目标点固定不变的情况
+  //普通飞
+  moveToPos(pos: Vec3, time: number, isUp: boolean = true, callback?) {
+    let startPos = this.node.position.clone();
+    let tempVec3 = new Vec3(0, 0, 0);
+    let controlPos = new Vec3(0, 0, 0);
+    Vec3.add(controlPos, startPos, pos);
+    controlPos.multiplyScalar(0.5);
+    if (isUp) controlPos.add3f(0, 3, 0);
+    tween(this.node)
+      .to(
+        time,
+        { position: pos },
+        {
+          onUpdate: (target, ratio) => {
+            Utils.bezierCurve(ratio, this.node.position, controlPos, pos, tempVec3);
+            this.node.setPosition(tempVec3);
+          },
+        },
+      )
+      .call(() => {
+        callback && callback();
+      })
+      .start();
+  }
+
+  //#region 飞  适合起始点和目标点固定不变的情况
+  //普通飞
+  moveToPos2(pos: Vec3, time: number, callback?) {
+    let targetPos = new Vec3(pos.x, 0.35, pos.z);
+
+    tween(this.node)
+      .to(time, { position: targetPos })
+      .call(() => {
+        callback && callback();
+      })
+      .start();
+  }
+
+  //#region 跳  适合起始点和目标点固定不变的情况
+  moveToPos_jump(pos: Vec3, time: number, callback?) {
+    let startPos = this.node.worldPosition.clone();
+    let midPos = new Vec3(0, 0, 0);
+    let endpos = pos.clone();
+    Vec3.add(midPos, startPos, endpos);
+    midPos.multiplyScalar(0.5);
+    const jumpHeight = 2;
+    tween({ t: 0 })
+      .to(
+        time,
+        { t: 1 },
+        {
+          easing: "linear",
+          onUpdate: (target: any) => {
+            const t = target.t;
+            // 水平线性插值
+            const x = startPos.x + (pos.x - startPos.x) * t;
+            const z = startPos.z + (pos.z - startPos.z) * t;
+            // 垂直抛物线：4h * t * (1 - t)
+            const y = startPos.y + 4 * jumpHeight * t * (1 - t);
+            if (y < 0.35) this.node.setPosition(x, 0.35, z);
+            else this.node.setPosition(x, y, z);
+          },
+        },
+      )
+      .call(() => {
+        callback && callback();
+      })
+      .start();
+  }
+
+  //#region 跳  适合起始点和目标点固定不变的情况
+  moveToPos_jump2(pos: Vec3, callback?) {
+    let startPos = this.node.position.clone();
+    let midPos = new Vec3(0, 0, 0);
+    let endpos = pos.clone();
+    const jumpHeight = 2;
+
+    Vec3.add(midPos, startPos, endpos);
+    midPos.multiplyScalar(0.5);
+
+    midPos.y += jumpHeight;
+    midPos.set((startPos.x + endpos.x) / 2, (startPos.y + endpos.y) / 2 + jumpHeight, (startPos.z + endpos.z) / 2);
+
+    tween(this.node)
+      .to(0.3, { position: midPos }, { easing: "quadOut" })
+      // .to(0.2, { position: endpos }, { easing: "cubicOut" })
+      .call(() => {
+        tween({ t: 0 })
+          .to(
+            0.3,
+            { t: 1 },
+            {
+              easing: "linear",
+              onUpdate: (target: any) => {
+                const t = target.t;
+                const easedZ = t * t * (3 - 2 * t);
+                const easedY = -0.15 * 9.8 * t ** 2;
+                const dz = endpos.z - midPos.z;
+                const dir = Math.sign(dz) * 0.25; // +1 / -1 / 0
+                // 水平线性插值
+                const x = midPos.x + (endpos.x - midPos.x) * t;
+                const z = midPos.z + (endpos.z - midPos.z) * easedZ + Math.sin(t * Math.PI) * dir;
+                const y = this.node.position.y + easedY; //(endpos.y - midPos.y) * easedY;
+                if (y < 0.35) this.node.setPosition(x, 0.35, z);
+                else this.node.setPosition(x, y, z);
+              },
+            },
+          )
+          .start();
+        callback && callback();
+      })
+      .start();
+  }
+
+  public testTg = false;
+  //#region 跳  适合起始点和目标点固定不变的情况
+  moveToPos_jump3(targetPos: Vec3, topPos: Vec3, callback?) {
+    let startPos = this.node.position.clone();
+    tween({ t: 0 })
+      .to(
+        0.3,
+        { t: 1 },
+        {
+          easing: "linear",
+          onUpdate: (target: any, ratio: number) => {
+            if (!this.testTg) {
+              const t = target.t;
+              const pos = new Vec3();
+              Vec3.lerp(pos, startPos, topPos, t);
+              pos.y += 1.5 * 4 * t * (1 - t);
+              this.node.setPosition(pos);
+            }
+            if (!this.testTg && ratio >= 0.95) {
+              this.testTg = true;
+              tween(this.node)
+                .to(0.1, { position: targetPos }, { easing: "expoIn" })
+                .call(() => {
+                  this.testTg = false;
+                })
+                .start();
+            }
+          },
+        },
+      )
+      .start();
   }
 }

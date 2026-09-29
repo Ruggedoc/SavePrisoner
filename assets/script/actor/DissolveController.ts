@@ -45,4 +45,26 @@ export class DissolveController extends Component {
       })
       .start();
   }
+
+  dissolveAllMat(time, callback?) {
+    const materials = this.meshRenderer.materials;
+    for (let material of materials) {
+      material.setProperty("dissolveColor1", this.dissolveColor);
+      material.setProperty("dissolveColor2", this.dissolveColor);
+      tween(this.dissolveProgress)
+        .to(
+          time,
+          { progress: 1 },
+          {
+            onUpdate: (target) => {
+              material.setProperty("dissolveThresholdValue", target.progress);
+            },
+          },
+        )
+        .call(() => {
+          callback && callback();
+        })
+        .start();
+    }
+  }
 }

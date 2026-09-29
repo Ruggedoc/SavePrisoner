@@ -1,0 +1,141 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "fe86409e-41db-47f3-a6f4-e61ef57cfcbe",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "73b7f": {
+      "importer": "gltf-animation",
+      "uuid": "fe86409e-41db-47f3-a6f4-e61ef57cfcbe@73b7f",
+      "displayName": "",
+      "id": "73b7f",
+      "name": "jump.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 0,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": [
+          {
+            "frame": 0.16666666666666666,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.16666666666666666,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.16666666666666666,
+            "func": "tojump",
+            "params": []
+          },
+          {
+            "frame": 0.7666666666666667,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.7666666666666667,
+            "func": "onfootdown",
+            "params": []
+          },
+          {
+            "frame": 0.9333333333333333,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.9333333333333333,
+            "func": "onjumpdown",
+            "params": []
+          }
+        ],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "speed": 1,
+        "auxiliaryCurves": {}
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "b291f": {
+      "importer": "gltf-scene",
+      "uuid": "fe86409e-41db-47f3-a6f4-e61ef57cfcbe@b291f",
+      "displayName": "",
+      "id": "b291f",
+      "name": "JUMP.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "jump",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 0,
+            "previousId": "73b7f"
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "fe86409e-41db-47f3-a6f4-e61ef57cfcbe@b291f"
+      ]
+    }
+  }
+}

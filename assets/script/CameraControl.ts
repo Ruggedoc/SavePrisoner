@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec3, screen, tween, Quat, v3, director, Director } from "cc";
+import { _decorator, Component, Node, Vec3, screen, tween, Quat, v3, director, Director, Tween } from "cc";
 import { GameGlobal } from "./GameGlobal";
 import { PlayableSDK } from "./Tool/PlayableSDK";
 import { PlayerAction } from "./Tool/PrintComponent";
@@ -7,11 +7,16 @@ const { ccclass, property } = _decorator;
 
 @ccclass("CameraControl")
 export class CameraControl extends Component {
+  @property(Node)
+  followRoot: Node;
+  @property(Node)
+  shakeRoot: Node;
+
   eulerHeng = new Vec3(-42, -35, 0);
   eulerShu = new Vec3(-42, -35, 0);
   actorPos = new Vec3(0, 0, 0);
-  hengPos = new Vec3(-19.8, 30, 27.85);
-  shuPos = new Vec3(-19.8, 30, 27.85);
+  hengPos = new Vec3(0, 3, 2);
+  shuPos = new Vec3(0, 3, 2);
   // hengPos = new Vec3(-2.2, 4.2, 0);
   // shuPos = new Vec3(-2.2, 4.2, 0);
   offsetPos = new Vec3(0, 0, 0);
@@ -37,38 +42,9 @@ export class CameraControl extends Component {
   public islookOverPos = false;
   public targetOverNode = null;
 
-  private moveTween = null;
-
-  //#region  震动参数
-  // /**是否开启震动 */
-  // private isShaking = false;
-  // /**震动结束将要恢复镜头 */
-  // private isShakEnd = false;
-  // /**持续时间 */
-  // private duration = 0;
-  // /**震动计时 */
-  // private elapsedTime = 0;
-  // /**震动幅度 值越大晃动区间越大 */
-  // private amplitude = 0;
-  // /**震动频率 震动时间内震动的次数，每次会重新计算震动曲线 */
-  // private frequency = 0;
-  // /**相机初始坐标点 */
-  // private originalPos = new Vec3();
-  // /**惯性的速度 */
-  // private velocity = new Vec3(); // 速度向量，用于产生惯性
-  // /**震动方向偏好（可以用于模拟特定方向冲击，如爆炸主要震向后方） */
-  // private directionBias = new Vec3(1, 1, 0);
-
-  public smoothSpeed: number = 5; // 跟随平滑系数
-
   // 震动相关
   private _isShaking: boolean = false;
-  private _shakeDuration: number = 0;
-  private _shakeIntensity: number = 0;
-  private _shakeTimer: number = 0;
 
-  // 当前位置缓存
-  private _currentPos: Vec3 = new Vec3();
   onLoad() {
     GameGlobal.CameraControl = this;
   }
@@ -79,8 +55,6 @@ export class CameraControl extends Component {
     this.currForward.set(0, 0, -1);
     this.tou = GameGlobal.actor.node.getChildByName("tou");
     this.cameraOnLoad();
-
-    director.on(Director.EVENT_AFTER_PHYSICS, this.onAfterPhysics, this);
   }
 
   cameraOnLoad() {
@@ -107,13 +81,16 @@ export class CameraControl extends Component {
   }
 
   cameraFollow() {
-    if (this.offsetPos.x == 0) {
-      return;
-    }
+    // if (this.offsetPos.x == 0) {
+    //   return;
+    // }
     this.actorPos = this.tou.worldPosition.clone();
     let pos = new Vec3();
     Vec3.add(pos, this.actorPos, this.offsetPos);
-    this.node.setPosition(pos);
+
+    // this.node.setPosition(pos);
+    this.followRoot.setPosition(pos);
+    // this.followRoot.setPosition(this.actorPos);
   }
 
   cameraFollowForTarget(target: Node) {
@@ -123,19 +100,19 @@ export class CameraControl extends Component {
     let targetPos = target.worldPosition.clone();
     let pos = new Vec3();
     Vec3.add(pos, targetPos, this.offsetPos);
-    this.node.setPosition(pos);
+    this.followRoot.setPosition(pos);
   }
 
   cameraMoveTotar_actor(targetNode: Node, time1, stoptime, time2, callback?) {
     GameGlobal.cameraMoving = true;
     //actor
-    let initPos = this.node.worldPosition.clone();
+    let initPos = this.followRoot.worldPosition.clone();
 
     let targetPos = targetNode.worldPosition.clone();
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
 
-    tween(this.node)
+    tween(this.followRoot)
       .to(time1, { worldPosition: targetPos2 })
       .delay(stoptime)
       .to(time2, { worldPosition: initPos })
@@ -148,10 +125,11 @@ export class CameraControl extends Component {
 
   cameraMoveToActor(moveTime = 0.7, callback?) {
     GameGlobal.cameraMoving = true;
-    let targetPos = this.tou.worldPosition.clone();
+    let temmp = this.tou.worldPosition.clone();
+    let targetPos = new Vec3(temmp.x, 1.9, temmp.z);
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
-    tween(this.node)
+    tween(this.followRoot)
       .to(moveTime, { worldPosition: targetPos2 })
       .call(() => {
         callback && callback();
@@ -166,7 +144,8 @@ export class CameraControl extends Component {
     let targetPos = targetNode.worldPosition.clone();
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
-    tween(this.node)
+    // tween(this.node)
+    tween(this.followRoot)
       .to(moveTime, { worldPosition: targetPos2 })
       .call(() => {
         callback && callback();
@@ -186,7 +165,7 @@ export class CameraControl extends Component {
     tween(GameGlobal.mainCamera)
       .to(upTime, { fov: cameraFov })
       .call(() => {
-        tween(this.node)
+        tween(this.followRoot)
           .to(moveTime, { worldPosition: targetPos2 })
           .call(() => {
             callback && callback();
@@ -208,7 +187,7 @@ export class CameraControl extends Component {
     tween(GameGlobal.mainCamera)
       .to(downTime, { fov: cameraFov })
       .call(() => {
-        tween(this.node)
+        tween(this.followRoot)
           .to(moveTime, { worldPosition: targetPos2 })
           .call(() => {
             callback && callback();
@@ -219,10 +198,11 @@ export class CameraControl extends Component {
       .start();
   }
 
-  cameraEnd() {
+  cameraEnd(callback?) {
     tween(GameGlobal.mainCamera)
       .to(0.5, { fov: this.gameInitFov + 20 })
       .call(() => {
+        callback && callback();
         // PlayableSDK.download(PlayerAction.automatic_jump);
       })
       .start();
@@ -236,7 +216,7 @@ export class CameraControl extends Component {
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
     tween(GameGlobal.mainCamera).to(0.3, { fov: this.overCameraFov }).start();
-    tween(this.node)
+    tween(this.followRoot)
       .to(0.3, { worldPosition: targetPos2 })
       .call(() => {
         callback && callback();
@@ -282,7 +262,7 @@ export class CameraControl extends Component {
     let targetPos = targetNode.worldPosition.clone();
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
-    tween(this.node)
+    tween(this.followRoot)
       .to(1, { worldPosition: targetPos2 })
       .call(() => {})
       .delay(1)
@@ -301,7 +281,7 @@ export class CameraControl extends Component {
     let targetPos = targetNode.worldPosition.clone();
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
-    tween(this.node)
+    tween(this.followRoot)
       .to(1, { worldPosition: targetPos2 })
       .call(() => {
         // GameGlobal.boss2.animPlay("attack");
@@ -319,15 +299,15 @@ export class CameraControl extends Component {
    */
   cameraMoveToPosPingPong(targetNode: Node, callback?) {
     GameGlobal.cameraMoving = true;
-    let initPos = this.node.worldPosition.clone();
+    let initPos = this.followRoot.worldPosition.clone();
     let targetPos = targetNode.worldPosition.clone();
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
-    tween(this.node)
+    tween(this.followRoot)
       .to(0.7, { worldPosition: targetPos2 })
       .call(() => {
         callback && callback();
-        tween(this.node)
+        tween(this.followRoot)
           .delay(1)
           .to(0.7, { worldPosition: initPos })
           .call(() => {
@@ -352,7 +332,7 @@ export class CameraControl extends Component {
     tween(GameGlobal.mainCamera)
       .to(0.5, { fov: this.gameInitFov + 5 })
       .call(() => {
-        tween(this.node)
+        tween(this.followRoot)
           .to(0.7, { worldPosition: targetPos2 })
           .call(() => {
             callback && callback();
@@ -361,7 +341,7 @@ export class CameraControl extends Component {
               .delay(1)
               .to(0.5, { fov: this.gameInitFov })
               .call(() => {
-                tween(this.node)
+                tween(this.followRoot)
                   .to(0.7, { worldPosition: initPos })
                   .call(() => {
                     GameGlobal.cameraMoving = false;
@@ -375,59 +355,38 @@ export class CameraControl extends Component {
       .start();
   }
 
+  //#region 清除相机移动
+  public clearCameraMove() {
+    Tween.stopAllByTarget(this.followRoot);
+  }
+
   //#region 摄像机震动
-  /**
-   * 触发摄像机震动
-   * @param intensity 震动强度（如：0.5表示在±0.5范围内随机偏移）
-   * @param duration 震动持续时间（秒）
-   */
-  public triggerShake(intensity: number = 0.5, duration: number = 0.3) {
-    this._shakeIntensity = intensity;
-    this._shakeDuration = duration;
-    this._shakeTimer = 0;
-    this._isShaking = true;
+  public get isShaking() {
+    return this._isShaking;
   }
 
-  public stopShake() {
-    this._isShaking = false;
-    // 震动结束后，直接归位到平滑跟随位置，避免跳帧
-    this.node.setWorldPosition(this._currentPos);
-  }
-
-  private onAfterPhysics() {
-    if (!this._isShaking) return;
-    // 1. 计算跟随的目标位置（世界坐标）
-    const targetWorldPos = this.tou.worldPosition;
-    const desiredPos = new Vec3(
-      targetWorldPos.x + this.offsetPos.x,
-      targetWorldPos.y + this.offsetPos.y,
-      targetWorldPos.z + this.offsetPos.z,
-    );
-
-    // 2. 平滑跟随（使用线性插值 lerp）
-    // 先获取当前位置
-    this._currentPos.set(this.node.worldPosition);
-    // 插值计算（smoothSpeed越大，跟随越快）
-    const lerpFactor = 1 - Math.exp((-this.smoothSpeed * 1) / 60);
-    Vec3.lerp(this._currentPos, this._currentPos, desiredPos, lerpFactor);
-
-    // 3. 叠加震动偏移
+  cameraShock(weak = false) {
     if (this._isShaking) {
-      // 在X和Y方向上产生随机偏移
-      const shakeX = (Math.random() - 0.5) * this._shakeIntensity * 2;
-      const shakeY = (Math.random() - 0.5) * this._shakeIntensity * 2;
-
-      // 最终位置 = 平滑跟随位置 + 震动偏移
-      this.node.setWorldPosition(this._currentPos.x + shakeX, this._currentPos.y + shakeY, this._currentPos.z);
-
-      // 更新震动计时
-      this._shakeTimer += 1 / 60;
-      if (this._shakeTimer >= this._shakeDuration) {
-        this.stopShake();
-      }
-    } else {
-      // 不震动时，直接使用平滑跟随后的位置
-      this.node.setWorldPosition(this._currentPos);
+      return;
     }
+    this._isShaking = true;
+
+    let strength: number;
+    if (weak) {
+      strength = 0.05;
+    } else {
+      strength = 0.5;
+    }
+
+    tween(this.shakeRoot)
+      .by(0.07, { position: v3(-strength, 0, 0) })
+      .by(0.07, { position: v3(strength, 0, 0) })
+      .by(0.07, { position: v3(0, -strength, 0) })
+      .by(0.07, { position: v3(0, strength, 0) })
+      .by(0.07, { position: Vec3.ZERO })
+      .call(() => {
+        this._isShaking = false;
+      })
+      .start();
   }
 }

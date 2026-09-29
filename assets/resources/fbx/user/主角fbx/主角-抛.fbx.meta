@@ -23,6 +23,16 @@
         },
         "events": [
           {
+            "frame": 0.2,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.2,
+            "func": "onThrowOneAudio",
+            "params": []
+          },
+          {
             "frame": 0.3,
             "func": "",
             "params": []
@@ -30,6 +40,16 @@
           {
             "frame": 0.3,
             "func": "onThrowOne",
+            "params": []
+          },
+          {
+            "frame": 0.7666666666666667,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.7666666666666667,
+            "func": "onThrowTwoAudio",
             "params": []
           },
           {
