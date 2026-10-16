@@ -58,6 +58,13 @@ export class WatarRoom extends Component {
   private pos2EfcArr: Node[] = [];
   private pos6EfcArr: Node[] = [];
 
+  //大触发器位置 浴缸与浴池
+  private noCarYGPos: Vec3 = v3(-0.929, 0.605, -0.76);
+  private noCarYCPos: Vec3 = v3(-0.694, 0.748, -0.746);
+  private isCarYGPos: Vec3 = v3(-0.4, 0.605, -0.4);
+  private isCarYCPos: Vec3 = v3(-0.2, 0.748, -0.4);
+
+  //地贴位置和大小
   private trgPosYG: Vec3 = v3(-2.291, 0, -0.38);
   private trgPosYC: Vec3 = v3(-3.275, 0, -0.138);
   private trgScaleYG: Vec3 = v3(1, 1, 0.7);
@@ -123,6 +130,12 @@ export class WatarRoom extends Component {
     this.YCTrigger.enabled = false;
     this.YGFoot.enabled = true;
     this.YCFoot.enabled = false;
+    this.onChangeTriggerArea(false);
+  }
+
+  public onChangeTriggerArea(isCarOpen: boolean) {
+    this.YGTrigger.node.setPosition(isCarOpen ? this.isCarYGPos : this.noCarYGPos);
+    this.YCTrigger.node.setPosition(isCarOpen ? this.isCarYCPos : this.noCarYCPos);
   }
 
   update(deltaTime: number) {

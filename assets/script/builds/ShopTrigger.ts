@@ -293,6 +293,7 @@ export class ShopTrigger extends Component {
         AudioManager.soundPlay("dtShow");
         this.node.active = true;
         this.init();
+        this.onEnable();
       });
       GameGlobal.nextBuyDitie = this.node;
       // GameGlobal.nextBuyPrice = GameGlobal.buyIceNumMoney;
@@ -578,6 +579,10 @@ export class ShopTrigger extends Component {
       GameGlobal.buyHummerNum = 2;
       GameGlobal.YDHummerOpen = true;
       GameGlobal.YDHummerOpenCamera = true;
+      GameGlobal.moneyBagMax = 100;
+      GameGlobal.bagoffset.bagMax = 100;
+      GameGlobal.bagoffset.baseDelayFactor = 0.1;
+      GameGlobal.actor.onPlayBagLvUp();
       let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerPos");
       GameGlobal.CameraControl.cameraMove2(muNode, () => {
         GameGlobal.curIceNumStage += 2;
@@ -663,9 +668,9 @@ export class ShopTrigger extends Component {
         },
         0.7,
       );
-      GameGlobal.moneyBagMax = 100;
-      GameGlobal.bagoffset.bagMax = 100;
-      GameGlobal.bagoffset.baseDelayFactor = 0.1;
+      GameGlobal.moneyBagMax = 150;
+      GameGlobal.bagoffset.bagMax = 150;
+      GameGlobal.bagoffset.baseDelayFactor = 0.05;
       GameGlobal.actor.onPlayBagLvUp();
 
       if (GameGlobal.yindao.curYDId == 9) {

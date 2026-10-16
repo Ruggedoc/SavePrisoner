@@ -358,7 +358,7 @@ export class Actor extends Component {
           this.isHummerIce = false;
           GameGlobal.YDHummerOpenCamera = false;
         });
-      }, 1);
+      }, 1.5);
     } else if (GameGlobal.YDHummerOpenCamera) {
       this.scheduleOnce(() => {
         GameGlobal.CameraControl.cameraShock(false);
@@ -370,7 +370,7 @@ export class Actor extends Component {
           this.isHummerIce = false;
           GameGlobal.YDHummerOpenCamera = false;
         });
-      }, 1.2);
+      }, 2.2);
     } else {
       this.scheduleOnce(() => {
         GameGlobal.CameraControl.cameraShock(false);
@@ -772,6 +772,7 @@ export class Actor extends Component {
     this.carCollider.enabled = isOpen;
     this.carCollider.isTrigger = !isOpen;
     this.carTrigger.node.active = isOpen;
+    GameGlobal.watarRoom.onChangeTriggerArea(isOpen);
     // this.onChangeHummerCollider(!isOpen && !this.getIsTakeNpc2());
   }
 
