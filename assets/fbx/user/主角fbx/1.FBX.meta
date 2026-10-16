@@ -252,15 +252,11 @@
       "hasBuiltinLOD": false,
       "options": [
         {
-          "screenRatio": 0.25,
+          "screenRatio": 0.01,
           "faceCount": 1
         },
         {
-          "screenRatio": 0.125,
-          "faceCount": 0.25
-        },
-        {
-          "screenRatio": 0.01,
+          "screenRatio": 0.002,
           "faceCount": 0.1
         }
       ]
@@ -287,6 +283,37 @@
       "scenes": [
         "1c85ee13-d16b-4c2a-88e4-e35761c13b99@35df0"
       ]
+    },
+    "meshCompress": {
+      "encode": true,
+      "compress": true,
+      "quantize": true,
+      "enable": false
+    },
+    "meshSimplify": {
+      "targetRatio": 0.21,
+      "enable": false,
+      "errorRate": 0
+    },
+    "meshOptimize": {
+      "enable": false,
+      "vertexCache": true,
+      "vertexFetch": true,
+      "overdraw": true
+    },
+    "legacyFbxImporter": false,
+    "allowMeshDataAccess": true,
+    "addVertexColor": false,
+    "generateLightmapUVNode": false,
+    "meshOptimizer": {
+      "enable": false,
+      "algorithm": "simplify",
+      "simplifyOptions": {
+        "targetRatio": 1,
+        "enableSmartLink": true,
+        "agressiveness": 7,
+        "maxIterationCount": 100
+      }
     }
   }
 }

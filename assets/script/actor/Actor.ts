@@ -672,6 +672,7 @@ export class Actor extends Component {
 
     if (GameGlobal.bOpenCar) {
       GameGlobal.actor.onChangeCarState(true);
+      GameGlobal.iceBoxList.onRefreshFootCollider();
       this.onTakeBodyMuch(body);
       if (GameGlobal.YDCarOpen) {
         GameGlobal.YDCarThrowState = 1;

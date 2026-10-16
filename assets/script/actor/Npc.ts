@@ -872,7 +872,6 @@ export class Npc extends Component {
         }, 2);
       }
     }
-    console.log("时间" + GameGlobal.throwingBodyTime);
     this.smileAni.play("emojiS");
     this.smileAni.once(Animation.EventType.FINISHED, () => {
       this.smileNode.active = false;

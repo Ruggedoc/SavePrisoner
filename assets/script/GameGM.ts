@@ -6,7 +6,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass("GameGM")
 export class GameGM extends Component {
-  //Q 清空背包 E 取消野外的道具 
+  //Q 清空背包 E 取消野外的道具
   start() {
     input.on(Input.EventType.KEY_PRESSING, this.onKeyDown, this);
   }
@@ -18,16 +18,19 @@ export class GameGM extends Component {
       if (GameGlobal.actor.bag2.children.length > 0) {
         let n = GameGlobal.actor.bag2.children[GameGlobal.actor.bag2.children.length - 1];
         n.removeFromParent();
-        GamePool.inst.poolPut("Money", n);
+        n.destroy();
+        // GamePool.inst.poolPut("Money", n);
         GameGlobal.actor.checkBagPos();
         GameGlobal.actor.cleanBag();
+        GameGlobal.mainGame.updateMoney();
       }
     } else if (event.keyCode == KeyCode.KEY_E) {
       //取消野外的道具
       if (GameGlobal.actor.PropListNode.children.length > 0) {
         let n = GameGlobal.actor.PropListNode.children[0];
         n.removeFromParent();
-        GamePool.inst.poolPut("Money", n);
+        // GamePool.inst.poolPut("Money", n);
+        n.destroy();
       }
     }
   }

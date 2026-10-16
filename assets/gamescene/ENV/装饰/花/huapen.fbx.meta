@@ -238,6 +238,23 @@
           {}
         ]
       }
+    },
+    "meshOptimize": {
+      "enable": false,
+      "vertexCache": true,
+      "vertexFetch": true,
+      "overdraw": true
+    },
+    "meshSimplify": {
+      "enable": false,
+      "targetRatio": 0.01,
+      "errorRate": 0
+    },
+    "meshCompress": {
+      "enable": false,
+      "encode": true,
+      "compress": true,
+      "quantize": false
     }
   }
 }

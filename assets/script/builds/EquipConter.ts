@@ -40,6 +40,11 @@ export class EquipConter extends Component {
   onGoldTriggerStay(event) {}
   onGoldTriggerEnter(event) {}
 
+  //#region 柜台金币+npc扔出的金币(还没飞到)
+  public getYDReallyMoney() {
+    return this.goldPos.children.length + this.npcPayMoneyArr.length;
+  }
+
   update(deltaTime: number) {
     if (GameGlobal.isOver) return;
     this.updataNpcPayMoneyArr(deltaTime);

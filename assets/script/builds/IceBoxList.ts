@@ -203,17 +203,10 @@ export class IceBoxList extends Component {
   onRefreshFootCollider() {
     if (GameGlobal.actor.getCarShowState()) {
       this.footcollTriggerNode.active = true;
-      // this.footcollNode.active = false;
       this.footcoll.isTrigger = true;
-      // this.footcollTrigger.enabled = true;
-      // this.footcoll.enabled = false;
     } else {
       this.footcollTriggerNode.active = !GameGlobal.actor.getIsTakeNpc2() && GameGlobal.bIceReady;
-      // this.footcollNode.active = !this.footcollTriggerNode.active;
       this.footcoll.isTrigger = this.footcollTriggerNode.active;
-
-      // this.footcoll.enabled = !GameGlobal.bIceReady || GameGlobal.actor.getIsTakeNpc2();
-      // this.footcollTrigger.enabled = !this.footcoll.enabled;
     }
   }
 
@@ -416,10 +409,10 @@ export class IceBoxList extends Component {
     }
   }
 
-  moveToPos(node: Node, pos: Vec3, delay: number, callback?) {
-    let startPos = node.position.clone();
-    let tempVec3 = new Vec3(0, 0, 0);
-    let controlPos = new Vec3(0, 0, 0);
+  private moveToPos(node: Node, pos: Vec3, delay: number, callback?) {
+    const startPos = node.position.clone();
+    const tempVec3 = new Vec3(0, 0, 0);
+    const controlPos = new Vec3(0, 0, 0);
     Vec3.add(controlPos, startPos, pos);
     controlPos.multiplyScalar(0.5);
     controlPos.add3f(0, 3, 0);
@@ -453,10 +446,10 @@ export class IceBoxList extends Component {
       return;
     }
     this.npcCount++;
-    let npcNode = GamePool.inst.poolGet("Npc");
+    const npcNode = GamePool.inst.poolGet("Npc");
     npcNode.getComponent(Npc).initData();
     npcNode.setParent(this.bodyList);
-    let pos2 = this.getNextNpcPos();
+    const pos2 = this.getNextNpcPos();
     npcNode.setPosition(this.getNpcInitPos());
     npcNode.setRotationFromEuler(0, 0, 0);
     npcNode.setRotationFromEuler(90, Utils.randomRange(-45, 45), Utils.randomRange(0, 180));
@@ -490,10 +483,10 @@ export class IceBoxList extends Component {
       return;
     }
     this.npcCount++;
-    let npcNode = GamePool.inst.poolGet("Npc");
+    const npcNode = GamePool.inst.poolGet("Npc");
     npcNode.getComponent(Npc).initData();
     npcNode.setParent(this.bodyList);
-    let pos2 = this.getNextNpcPos();
+    const pos2 = this.getNextNpcPos();
 
     npcNode.setPosition(this.getNpcInitPos());
     npcNode.setRotationFromEuler(0, 0, 0);
@@ -518,19 +511,19 @@ export class IceBoxList extends Component {
     }, 0.01);
   }
   public getNpcInitPos() {
-    let idx = Math.floor(Utils.randomRange(0, 3));
+    const idx = Math.floor(Utils.randomRange(0, 3));
     if (idx >= 0 && idx < this.fromPosArr.length) return this.fromPosArr[idx];
   }
 
   public getNextNpcPos() {
-    let reultPos: Vec3 = new Vec3(0, 0, 0);
+    const reultPos: Vec3 = new Vec3(0, 0, 0);
     if (this.bodyList.children.length >= GameGlobal.saveMaxNum) {
       return GameGlobal.bodyPosArr[Math.floor(Utils.randomRange(0, GameGlobal.saveMaxNum))];
     }
     let idx1 = 0;
     for (idx1 = 0; idx1 < GameGlobal.saveMaxNum; idx1++) {
       if (!this.checkHave(idx1)) {
-        reultPos = GameGlobal.bodyPosArr[idx1];
+        reultPos.set(GameGlobal.bodyPosArr[idx1]);
         GameGlobal.bodyPosSet.add({ idx: idx1, pos: reultPos });
         break;
       }
