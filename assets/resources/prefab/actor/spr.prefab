@@ -2256,10 +2256,6 @@
     "__prefab": {
       "__id__": 126
     },
-    "hitfab": {
-      "__uuid__": "7a5f85a0-48be-4a54-bb57-92b84a9732a3",
-      "__expectedType__": "cc.Prefab"
-    },
     "bloodBarComp": {
       "__id__": 59
     },

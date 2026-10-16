@@ -72,6 +72,8 @@ export class Actor extends Component {
   carNode: Node;
   @property(Node)
   carEfcNode: Node;
+  @property(Node)
+  bagLvUp: Node;
   @property({ type: [Collider] })
   fanTanColliders: Collider[] = [];
 
@@ -147,6 +149,7 @@ export class Actor extends Component {
   groundCollider: null;
   isHummerIce: boolean = false;
   isJump: boolean = false;
+  isWait: boolean = false;
   isFirstJump: boolean = true;
 
   monsySoundCount: number = 3;
@@ -237,6 +240,8 @@ export class Actor extends Component {
     this.isMoving = false;
   }
 
+  testTime = 0;
+
   protected update(dt: number): void {
     if (GameGlobal.isOver || GameGlobal.isStop) {
       return;
@@ -248,9 +253,9 @@ export class Actor extends Component {
       if (!Vec3.ZERO.equals(this.moveDir)) {
         this.directUpdateRotation(this.moveDir);
       }
-    }
-    if (this.isuserMove) {
-      this.UserDoMove(this.userdir);
+      if (this.isuserMove) {
+        this.UserDoMove(this.userdir);
+      }
     }
   }
 
@@ -271,58 +276,105 @@ export class Actor extends Component {
         this.animPlay(aniType);
       }
       if (GameGlobal.FMPlayer != null && GameGlobal.FMPlayer.isYDNpcMove) return;
+      if (GameGlobal.YDFollowOther) return;
       GameGlobal.CameraControl.cameraFollow();
     }
   }
-
-  //#region 播放跳跃踩按钮
-  onJumpButton() {
-    if (this.isHummerIce) return;
+  //#region 跳跃踩按钮
+  public onJumpToButton() {
     GameGlobal.mainGame.stopjoy();
     this.isHummerIce = true;
     this.isJump = true;
     this.issnakeMap = true;
-    this.onChangeHummerCollider(false);
-
     let targetPos = GameGlobal.iceBoxList.saveTrigger.worldPosition.clone();
     this.lookAt(targetPos);
-    if (this.getIsTakeNpc2()) {
-      this.animPlay(State_User.Jump2);
-    } else {
-      this.animPlay(State_User.Jump, () => {
-        this.onJumpFinish();
-        // GameGlobal.iceBoxList.onTrggerStay();
-      });
-    }
-    if (this.isFirstJump) {
-      let hummerPos = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPosStart");
-      GameGlobal.CameraControl.cameraMove2(hummerPos, null, 0.5);
-    }
+    this.animPlay(State_User.Jump, () => {
+      // GameGlobal.iceBoxList.isTriggerOpen = false;
+      // if (!GameGlobal.iceBoxList.isFristYD) {
+      //   this.onJumpMoveBack();
+      // }
+    });
+    // if (this.isFirstJump) {
+    //   let hummerPos = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPosStart");
+    //   GameGlobal.CameraControl.cameraMove2(hummerPos, null, 0.5);
+    // }
+    // if (GameGlobal.YDHummerOpenCamera) {
+    //   let hummerPos2 = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPos");
+    //   GameGlobal.CameraControl.cameraMove5(hummerPos2, 0.7, 1.3, 0.7);
+    // }
   }
 
   public onJumpFinish() {
+    if (this.isFirstJump) {
+      let hummerPos = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPosStart");
+      GameGlobal.CameraControl.cameraMove2(hummerPos, () => {}, 0.5);
+    }
+    if (GameGlobal.YDHummerOpenCamera) {
+      let hummerPos2 = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPos");
+      GameGlobal.CameraControl.cameraMove5(hummerPos2, 0.7);
+    }
+    this.isJump = false;
+    GameGlobal.iceBoxList.isTriggerOpen = false;
+    this.onJumpMoveBack();
+  }
+
+  public onJumpMoveBack() {
     let movePos = GameGlobal.mainGame.GamePosNode.getChildByName("jumpOverPos").worldPosition.clone();
     let lookPos = new Vec3(movePos.x, 0.35, movePos.z);
     this.turnToTarget(lookPos);
     this.scheduleOnce(() => {
       this.animPlay(State_User.Move);
       this.moveToPos(movePos, 0.3, false, () => {
-        this.isHummerIce = false;
+        this.isJump = false;
+        if (!this.isFirstJump && !GameGlobal.YDHummerOpenCamera) {
+          this.isHummerIce = false;
+        }
         GameGlobal.iceBoxList.isTriggerOpen = false;
         this.animPlay(State_User.Idle);
-        this.onChangeHummerCollider(true);
+        // this.onChangeHummerCollider(true);
       });
     }, 0.3);
 
     this.scheduleOnce(() => {
-      GameGlobal.CameraControl.cameraShock(false);
-    }, 0.2);
+      if (GameGlobal.yindao.curYDId == 0) {
+        GameGlobal.yindao.curYDId = 1;
+      } else if (GameGlobal.yindao.curYDId == 5) {
+        if (GameGlobal.bOpenCar) {
+          GameGlobal.yindao.curYDId = 7;
+        } else {
+          GameGlobal.yindao.curYDId = 6;
+        }
+      }
+    }, 1);
 
     if (this.isFirstJump) {
       this.scheduleOnce(() => {
-        GameGlobal.CameraControl.cameraMoveToActor(0.4);
-        this.isFirstJump = false;
+        GameGlobal.CameraControl.cameraShock(false);
+      }, 0.5);
+
+      this.scheduleOnce(() => {
+        GameGlobal.CameraControl.cameraMoveToActor(0.4, () => {
+          this.isFirstJump = false;
+          this.isHummerIce = false;
+          GameGlobal.YDHummerOpenCamera = false;
+        });
       }, 1);
+    } else if (GameGlobal.YDHummerOpenCamera) {
+      this.scheduleOnce(() => {
+        GameGlobal.CameraControl.cameraShock(false);
+      }, 1);
+
+      this.scheduleOnce(() => {
+        GameGlobal.CameraControl.cameraMove6(0.7, () => {
+          this.isFirstJump = false;
+          this.isHummerIce = false;
+          GameGlobal.YDHummerOpenCamera = false;
+        });
+      }, 1.2);
+    } else {
+      this.scheduleOnce(() => {
+        GameGlobal.CameraControl.cameraShock(false);
+      }, 0.2);
     }
   }
 
@@ -332,10 +384,10 @@ export class Actor extends Component {
     this.scheduleOnce(() => {
       this.animPlay(State_User.BaoMove);
       this.moveToPos(targetPos, 0.45, false, () => {
-        this.isHummerIce = false;
-        GameGlobal.iceBoxList.isTriggerOpen = false;
+        // this.isHummerIce = false;
+        // GameGlobal.iceBoxList.isTriggerOpen = false;
         this.animPlay(State_User.BaoIdle);
-        this.onChangeHummerCollider(false);
+        // this.onChangeHummerCollider(false);
       });
     }, 0.15);
     // this.scheduleOnce(() => {
@@ -389,14 +441,14 @@ export class Actor extends Component {
   public isuserMove = false;
   public userdir = new Vec3();
   move(dir: Vec3) {
-    if (!dir || Vec3.ZERO.equals(dir)) {
+    if (GameGlobal.cameraMoving || this.isWalkStop || this.isHummerIce) {
+      this.isMoving = false;
       this.userRigidBody.setLinearVelocity(Vec3.ZERO);
       this.clearAngularVelocity();
       this.onChangeBodyBagPos();
       return;
     }
-    if (GameGlobal.cameraMoving || this.isWalkStop || this.isHummerIce) {
-      this.isMoving = false;
+    if (!dir || Vec3.ZERO.equals(dir)) {
       this.userRigidBody.setLinearVelocity(Vec3.ZERO);
       this.clearAngularVelocity();
       this.onChangeBodyBagPos();
@@ -544,6 +596,15 @@ export class Actor extends Component {
       this.bag4.children[0].setPosition(bag4MovePos);
     }
   }
+
+  //#region 播放背包升级动画
+  public onPlayBagLvUp() {
+    this.bagLvUp.active = true;
+    this.scheduleOnce(() => {
+      this.bagLvUp.active = false;
+    }, 1.5);
+  }
+
   /**
    * 当前尸体已经在身上了
    * @returns true:在身上
@@ -573,8 +634,8 @@ export class Actor extends Component {
    */
   public bNowTakeBody(): Node {
     if (GameGlobal.bOpenCar) {
-      let tNode = this.NpcTakePos;
-      let len: number = tNode.children.length;
+      const tNode = this.NpcTakePos;
+      const len: number = tNode.children.length;
       if (len > 0) {
         return tNode.children[len - 1];
       }
@@ -596,11 +657,12 @@ export class Actor extends Component {
     if (!this.bCanTakeBody()) {
       return;
     }
-    let takeMax = GameGlobal.takeBodyMax1;
+
     if (GameGlobal.bOpenCar) {
-      takeMax = GameGlobal.takeBodyMax2;
+      if (this.getCarTakeNpcNum() >= GameGlobal.takeBodyMax2) return;
+    } else {
+      if (this.getTakeNpcNum() >= GameGlobal.takeBodyMax1) return;
     }
-    if (GameGlobal.curTakeBody >= takeMax) return;
 
     let body = otherNode.parent.parent;
     let muSrc = body.getComponent(Npc);
@@ -612,10 +674,19 @@ export class Actor extends Component {
       GameGlobal.actor.onChangeCarState(true);
       this.onTakeBodyMuch(body);
       if (GameGlobal.YDCarOpen) {
-        GameGlobal.YDCarOpenState = 1;
+        GameGlobal.YDCarThrowState = 1;
+      }
+      if (GameGlobal.YDPoolOpen) {
+        GameGlobal.YDCarThrowState = 1;
+      }
+      if (GameGlobal.yindao.curYDId == 7) {
+        GameGlobal.yindao.curYDId = 8;
       }
     } else {
       this.onTakeBodySingle(body);
+      if (GameGlobal.yindao.curYDId == 1) {
+        GameGlobal.yindao.curYDId++;
+      }
     }
     AudioManager.soundPlay("takeIceNpc");
   }
@@ -625,23 +696,23 @@ export class Actor extends Component {
    * @param body 将要捡起的尸体
    */
   private onTakeBodySingle(body: Node) {
-    let takPosNode = GameGlobal.curTakeBody == 1 ? this.bag4 : this.bag3;
-    let takePosVe3 = GameGlobal.curTakeBody == 1 ? GameGlobal.curTakeBodyPos1 : GameGlobal.curTakeBodyPos2;
-    let takeRotVe3 = GameGlobal.curTakeBody == 1 ? GameGlobal.curTakeBodyRot1 : GameGlobal.curTakeBodyRot2;
-    let muSrc = body.getComponent(Npc);
+    const takeNpcNum = this.getTakeNpcNum();
+    const takPosNode = takeNpcNum == 1 ? this.bag4 : this.bag3;
+    const takePosVe3 = takeNpcNum == 1 ? GameGlobal.curTakeBodyPos1 : GameGlobal.curTakeBodyPos2;
+    const takeRotVe3 = takeNpcNum == 1 ? GameGlobal.curTakeBodyRot1 : GameGlobal.curTakeBodyRot2;
+    const muSrc = body.getComponent(Npc);
 
-    GameGlobal.curTakeBody++;
     muSrc.isready = false;
     AudioManager.soundPlay("takeIceNpc", 0.2);
-    let oldPos = body.worldPosition.clone();
-    let oldRot = body.worldRotation.clone();
+    const oldPos = body.worldPosition.clone();
+    const oldRot = body.worldRotation.clone();
     body.setScale(Vec3.ONE);
     body.getChildByName("bodyMod").position = Vec3.ZERO;
     body.setParent(takPosNode);
     body.setWorldPosition(oldPos);
     body.setRotation(oldRot);
     muSrc.animPlay(NpcAniState.ice2);
-
+    GameGlobal.iceBoxList.onRefreshFootCollider();
     muSrc.moveToPos2(body, takePosVe3, 0.3, takeRotVe3, () => {
       this.cleanBag();
     });
@@ -655,17 +726,16 @@ export class Actor extends Component {
    * @param body 将要捡起的尸体
    */
   private onTakeBodyMuch(body: Node) {
-    let takPosNode = this.NpcTakePos;
-    let tLen = takPosNode.children.length;
-    let muSrc = body.getComponent(Npc);
+    const takPosNode = this.NpcTakePos;
+    const tLen = takPosNode.children.length;
+    const muSrc = body.getComponent(Npc);
 
-    GameGlobal.curTakeBody++;
     muSrc.isready = false;
 
-    let targetLocalPos = this.carBodyPosArr[tLen];
-    let targetLocalRot = this.carBodyRotArr[tLen];
+    const targetLocalPos = this.carBodyPosArr[tLen];
+    const targetLocalRot = this.carBodyRotArr[tLen];
 
-    let startWorldPos = body.worldPosition.clone();
+    const startWorldPos = body.worldPosition.clone();
     body.setParent(takPosNode);
     GameGlobal.iceBoxList.onSetPosIdx(body.position);
     body.eulerAngles = targetLocalRot;
@@ -694,18 +764,20 @@ export class Actor extends Component {
         callBack && callBack();
       }, 1);
       this.onBagNpcPosChange();
+      GameGlobal.iceBoxList.onRefreshFootCollider();
       GameGlobal.iceBoxList.isTriggerOpen = true;
       GameGlobal.isFirstThrow = true;
     }
     this.carCollider.enabled = isOpen;
     this.carCollider.isTrigger = !isOpen;
     this.carTrigger.node.active = isOpen;
-    this.onChangeHummerCollider(!isOpen && !this.getIsTakeNpc2());
+    // this.onChangeHummerCollider(!isOpen && !this.getIsTakeNpc2());
   }
 
-  public onChangeHummerCollider(isOpen: boolean) {
-    GameGlobal.iceBoxList.saveTrigger.getChildByName("jumpPZ").active = isOpen;
-  }
+  // public onChangeHummerCollider(isOpen: boolean) {
+  //   GameGlobal.iceBoxList.saveTrigger.getChildByName("jumpPZ").active = false;
+  //   // GameGlobal.iceBoxList.saveTrigger.getChildByName("jumpPZ").active = isOpen;
+  // }
 
   //#region 获取手推车显示状态
   public getCarShowState(): boolean {
@@ -781,6 +853,7 @@ export class Actor extends Component {
     }
   }
 
+  /**获取当前背包2中的金币数量 */
   onGetBag2ReallyCount(): number {
     let count = this.bag2.children.length + GameGlobal.equipConter.actorTakeMoneyArr.length;
     return count;
@@ -791,6 +864,10 @@ export class Actor extends Component {
       //拿完了或者背包满了
       let isOpen = GameGlobal.equipConter.goldPos.children.length <= 0 && GameGlobal.actor.bag2.children.length > 0;
       if (isOpen || GameGlobal.actor.bag2.children.length >= GameGlobal.moneyBagMax) {
+        if (GameGlobal.yindao.curYDId == 3) {
+          GameGlobal.yindao.curYDId++;
+        }
+        GameGlobal.mainGame.stopjoy();
         GameGlobal.ditieList.getChildByName("buyHummer").getComponent(ShopTrigger).onNodeOpen();
         GameGlobal.isFirstGetGold = false;
       }
@@ -907,13 +984,13 @@ export class Actor extends Component {
       return;
     }
     AudioManager.audioStop("move");
-    this.isuserMove = false;
     this.userdir = Vec3.ZERO;
     this.isMoving = false;
     this.moveDir = Vec3.ZERO;
     this.move(Vec3.ZERO);
+    this.isuserMove = false;
     GameGlobal.bagoffset.offMovingOffset();
-    if (this.isWalkStop) return;
+    if (this.isJump || this.isWalkStop) return;
     this.onIdle();
   }
 
@@ -1032,6 +1109,32 @@ export class Actor extends Component {
   //#region 获取玩家有没有带着NPC 抱着
   getIsTakeNpc2() {
     return this.bag3.children.length > 0 || this.bag4.children.length > 0;
+  }
+  //#region 获取玩家抱人满没满
+  getIsTakeNpc4() {
+    return this.bag3.children.length > 0 && this.bag4.children.length > 0;
+  }
+  //#region 获取玩家小车满没满
+  getIsTakeNpc3() {
+    return this.NpcTakePos.children.length >= GameGlobal.takeBodyMax2;
+  }
+
+  //#region 获取玩家正在抱的NPC节点
+  getTakeNpc() {
+    if (this.bag3.children.length > 0) return this.bag3.children[0];
+    else if (this.bag4.children.length > 0) return this.bag4.children[0];
+    else return null;
+  }
+  //#region 获取抱着的NPC数量
+  getTakeNpcNum() {
+    let result = 0;
+    if (this.bag3.children.length > 0) result += 1;
+    if (this.bag4.children.length > 0) result += 1;
+    return result;
+  }
+  //#region 获取玩家小车上的NPC数量
+  getCarTakeNpcNum() {
+    return this.NpcTakePos.children.length;
   }
 
   //#region 飞  适合起始点和目标点固定不变的情况

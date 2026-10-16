@@ -47,7 +47,13 @@ export class WatarRoom extends Component {
   /**是否扔完尸体了 */
   bThrowFinish: boolean = true;
   bThrowing: boolean = false;
+  /**手推车连续扔尸体是否进行中 */
+  private bCarThrowing: boolean = false;
+  /**手推车扔尸体计时器 */
+  private carThrowTimer: number = 0;
   currAnim: string;
+  YDFollowNpc: Node;
+  YDFollowStart: boolean = false;
 
   private pos2EfcArr: Node[] = [];
   private pos6EfcArr: Node[] = [];
@@ -103,12 +109,14 @@ export class WatarRoom extends Component {
     this.YGTrigger.on("onTriggerStay", this.onThrowTriggerStay, this);
     this.YGTrigger.on("onTriggerExit", this.onThrowTriggerExit, this);
     this.YGFoot.on("onTriggerEnter", this.onSelectEnter, this);
+    this.YGFoot.on("onTriggerStay", this.onSelectStay, this);
     this.YGFoot.on("onTriggerExit", this.onSelectExit, this);
 
     this.YCTrigger.on("onTriggerEnter", this.onThrowTriggerEnter, this);
     this.YCTrigger.on("onTriggerStay", this.onThrowTriggerStay, this);
     this.YCTrigger.on("onTriggerExit", this.onThrowTriggerExit, this);
     this.YCFoot.on("onTriggerEnter", this.onSelectEnter, this);
+    this.YCFoot.on("onTriggerStay", this.onSelectStay, this);
     this.YCFoot.on("onTriggerExit", this.onSelectExit, this);
 
     this.YGTrigger.enabled = true;
@@ -117,17 +125,42 @@ export class WatarRoom extends Component {
     this.YCFoot.enabled = false;
   }
 
-  update(deltaTime: number) {}
+  update(deltaTime: number) {
+    if (GameGlobal.isFirstThrow) {
+      if (!this.YDFollowStart) return;
+      if (this.YDFollowNpc == null) return;
+      GameGlobal.CameraControl.cameraFollowForTarget(this.YDFollowNpc);
+    }
+    if (this.bCarThrowing) {
+      this.carThrowTimer += deltaTime;
+      if (this.carThrowTimer >= this.throwTime) {
+        this.carThrowTimer = 0;
+        this.doCarThrow();
+      }
+    }
+  }
   onSelectEnter(event) {
     let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 1) {
+      this.bInTriggerArea = true;
       this.throwTriggerNode.getChildByName("select").active = true;
     }
   }
+
+  onSelectStay(event) {
+    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    if (body.getGroup() == 1) {
+      this.onThrowTriggerStay(event);
+    }
+  }
+
   onSelectExit(event) {
     let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 1) {
       this.throwTriggerNode.getChildByName("select").active = false;
+      this.bInTriggerArea = false;
+      this.bThrowFinish = true;
+      GameGlobal.actor.isWalkStop = false;
     }
   }
 
@@ -138,38 +171,52 @@ export class WatarRoom extends Component {
       // this.throwTriggerNode.getChildByName("select").active = true;
       if (GameGlobal.actor.bNowTakeBody() == null) return;
       if (GameGlobal.bOpenPool) {
-        if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax2) return;
+        if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax2) return;
       } else {
-        if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax1) return;
+        if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax1) return;
       }
     }
   }
 
   throwTime: number = 0.25;
-  timeDown: number = 0;
-  DTTime: number = 0.02;
   //#region 扔尸体到水池的触发器
   private onThrowTriggerStay(event) {
     if (GameGlobal.poolAni) return;
     if (!this.bInTriggerArea) return;
     if (GameGlobal.actor.bNowTakeBody() == null) return;
     if (GameGlobal.isFirstThrow) {
-      GameGlobal.isFirstThrow = false;
-      GameGlobal.CameraControl.cameraMoveTotar_actor(
-        MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("waterPool1"),
-        0.7,
-        1,
-        0.5,
-        () => {
-          GameGlobal.cameraMoving = false;
-        },
-      );
+      if (GameGlobal.bOpenCar) {
+        GameGlobal.isFirstThrow = false;
+        GameGlobal.CameraControl.cameraMoveTotar_actor(
+          MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("waterPool1"),
+          0.7,
+          0.5,
+          0.5,
+          () => {
+            GameGlobal.cameraMoving = false;
+          },
+        );
+      } else {
+        if (this.YDFollowNpc == null) {
+          const followNpc = GameGlobal.actor.getTakeNpc();
+          this.YDFollowNpc = followNpc.getChildByName("tou");
+        }
+        GameGlobal.CameraControl.cameraMove2(
+          MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("waterPool1"),
+          () => {
+            this.scheduleOnce(() => {
+              this.YDFollowStart = true;
+            }, 0.2);
+          },
+          0.3,
+        );
+      }
     }
 
     if (GameGlobal.bOpenPool) {
-      if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax2) return;
+      if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax2) return;
     } else {
-      if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax1) return;
+      if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax1) return;
     }
 
     // if (!this.bThrowing && GameGlobal.bOpenCar) {
@@ -224,44 +271,47 @@ export class WatarRoom extends Component {
     }
   }
 
-  //手推车扔加一个间隔
+  //手推车扔加一个间隔（启动连续投掷，由 update 驱动）
   public onThrowBody2() {
-    this.timeDown += this.DTTime;
-    if (this.timeDown >= this.throwTime) {
-      this.timeDown = 0;
-      this.onThrowBody();
-      // AudioManager.soundPlay("throwNpc");
-      let bodyNode: Node = GameGlobal.actor.bNowTakeBody();
-      if (bodyNode == null) {
+    if (this.bCarThrowing) return;
+    this.bCarThrowing = true;
+    this.carThrowTimer = 0;
+    this.doCarThrow();
+  }
+
+  private doCarThrow() {
+    this.onThrowBody();
+    let bodyNode: Node = GameGlobal.actor.bNowTakeBody();
+    if (bodyNode == null) {
+      this.bThrowFinish = true;
+      GameGlobal.actor.isWalkStop = false;
+      GameGlobal.actor.onChangeCarState(false);
+      GameGlobal.actor.animPlay(State_User.Idle);
+      GameGlobal.iceBoxList.onRefreshFootCollider();
+      this.bCarThrowing = false;
+      return;
+    }
+
+    if (GameGlobal.bOpenPool) {
+      if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax2) {
         this.bThrowFinish = true;
         GameGlobal.actor.isWalkStop = false;
-        GameGlobal.actor.onChangeCarState(false);
-        GameGlobal.actor.animPlay(State_User.Idle);
+        this.bCarThrowing = false;
         return;
       }
-
-      if (GameGlobal.bOpenPool) {
-        if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax2) {
-          this.bThrowFinish = true;
-          GameGlobal.actor.isWalkStop = false;
-          return;
-        }
-      } else {
-        if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax1) {
-          this.bThrowFinish = true;
-          GameGlobal.actor.isWalkStop = false;
-          return;
-        }
+    } else {
+      if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax1) {
+        this.bThrowFinish = true;
+        GameGlobal.actor.isWalkStop = false;
+        this.bCarThrowing = false;
+        return;
       }
     }
-    this.scheduleOnce(() => {
-      this.onThrowBody2();
-    });
   }
 
   //#region 人物扔进池子
   public onThrowBody() {
-    let bodyNode: Node = GameGlobal.actor.bNowTakeBody();
+    const bodyNode: Node = GameGlobal.actor.bNowTakeBody();
     if (bodyNode == null) {
       this.bThrowFinish = true;
       if (GameGlobal.bOpenCar) {
@@ -273,34 +323,36 @@ export class WatarRoom extends Component {
       return;
     }
     if (GameGlobal.bOpenPool) {
-      if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax2) {
+      if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax2) {
         this.bThrowFinish = true;
         GameGlobal.actor.isWalkStop = false;
         return;
       }
     } else {
-      if (GameGlobal.curWaterBody >= GameGlobal.waterOpenMax1) {
+      if (this.getWaterNpcNum() >= GameGlobal.waterOpenMax1) {
         this.bThrowFinish = true;
         GameGlobal.actor.isWalkStop = false;
         return;
       }
     }
-    if (GameGlobal.YDCarOpen && GameGlobal.YDCarOpenState == 1) {
+    if (GameGlobal.YDCarOpen && GameGlobal.YDCarThrowState == 1) {
       GameGlobal.YDCarOpen = false;
     }
-
-    let posObject = this.getThrowTargetPos();
-    let targetPos = posObject.pos;
-    let worldPos = bodyNode.worldPosition.clone();
-    let worldRot = bodyNode.worldRotation.clone();
-    let bodySrc = bodyNode.getComponent(Npc);
+    if (GameGlobal.YDPoolOpen && GameGlobal.YDCarThrowState == 1) {
+      GameGlobal.YDPoolOpen = false;
+    }
+    const posObject = this.getThrowTargetPos();
+    const targetPos = posObject.pos;
+    const worldPos = bodyNode.worldPosition.clone();
+    const worldRot = bodyNode.worldRotation.clone();
+    const bodySrc = bodyNode.getComponent(Npc);
     bodySrc.curJumpPos = targetPos;
     bodySrc.inWaterIdx = posObject.index;
     bodyNode.getChildByName("bodyMod").position = Vec3.UP;
     bodyNode.setParent(this.pan);
     bodyNode.worldPosition = worldPos;
     bodyNode.worldRotation = worldRot;
-    let targetRot = this.getThrowTargetRot();
+    const targetRot = this.getThrowTargetRot();
     bodyNode.worldScale = Vec3.ONE;
     bodySrc.moveToPos(
       bodyNode,
@@ -325,44 +377,50 @@ export class WatarRoom extends Component {
       },
     );
 
-    GameGlobal.curWaterBody++;
-    GameGlobal.curTakeBody--;
+    GameGlobal.iceBoxList.onRefreshFootCollider();
+
+    if (GameGlobal.yindao.curYDId == 2 || GameGlobal.yindao.curYDId == 8) {
+      GameGlobal.yindao.curYDId++;
+    } else if (GameGlobal.yindao.curYDId == 11) {
+      if (GameGlobal.bPlayerOpen) {
+        GameGlobal.yindao.curYDId = 13;
+      } else {
+        GameGlobal.yindao.curYDId = 12;
+      }
+    }
   }
   //#region 获取扔进池子的落点
   public getThrowTargetPos(): { pos: Vec3; index: number } {
-    let resultPos = new Vec3(0, 0, 0);
-    let resultIndex = 0;
     let targetPosArr: Vec3[] = GameGlobal.bOpenPool ? GameGlobal.inWaterPos6Arr : GameGlobal.inWaterPos2Arr;
+    let panChildren = this.pan.children;
+    if (panChildren.length === 0) {
+      return { pos: targetPosArr[0], index: 0 };
+    }
+    let occupiedPositions: Vec3[] = [];
+    for (let j = 0; j < panChildren.length; j++) {
+      occupiedPositions.push(panChildren[j].getComponent(Npc).curJumpPos);
+    }
     for (let i = 0; i < targetPosArr.length; i++) {
-      if (this.pan.children.length > 0) {
-        let bHave = false;
-        for (let j = 0; j < this.pan.children.length; j++) {
-          let targetPos = this.pan.children[j].getComponent(Npc).curJumpPos;
-          if (targetPos.equals(targetPosArr[i])) {
-            bHave = true;
-            break;
-          }
-        }
-        if (!bHave) {
-          resultPos = targetPosArr[i];
-          resultIndex = i;
+      let bHave = false;
+      for (let j = 0; j < occupiedPositions.length; j++) {
+        if (occupiedPositions[j].equals(targetPosArr[i])) {
+          bHave = true;
           break;
         }
-      } else {
-        resultPos = targetPosArr[i];
-        resultIndex = i;
-        break;
+      }
+      if (!bHave) {
+        return { pos: targetPosArr[i], index: i };
       }
     }
-    return { pos: resultPos, index: resultIndex };
+    return { pos: new Vec3(0, 0, 0), index: 0 };
   }
 
   //#region 获取扔进池子的旋转
   public getThrowTargetRot(): Vec3 {
     if (GameGlobal.bOpenPool) {
-      return Math.floor(GameGlobal.curWaterBody / 3) > 0 ? new Vec3(0, 90, 0) : new Vec3(0, -90, 0);
+      return Math.floor(this.getWaterNpcNum() / 3) > 0 ? new Vec3(0, 90, 0) : new Vec3(0, -90, 0);
     } else {
-      return GameGlobal.curWaterBody == 0 ? new Vec3(0, 180, 0) : new Vec3(0, 0, 0);
+      return this.getWaterNpcNum() == 0 ? new Vec3(0, 180, 0) : new Vec3(0, 0, 0);
     }
   }
 
@@ -455,5 +513,10 @@ export class WatarRoom extends Component {
       }
     }, 0.1);
     AudioManager.soundPlay("propShow");
+  }
+
+  //#region 当前水池里的NPC数量
+  public getWaterNpcNum() {
+    return this.pan.children.length;
   }
 }

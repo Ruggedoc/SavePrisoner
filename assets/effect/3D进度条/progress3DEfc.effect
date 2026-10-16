@@ -1,0 +1,83 @@
+CCEffect %{
+  techniques:
+  - name: opaque
+    passes:
+    - vert: progress-vs:vert
+      frag: progress-fs:frag
+      properties: &props
+        mainTexture:    { value: white }
+        mainColor:      { value: [1, 1, 1, 1], editor: { type: color } }
+        progress:       { value: 1.0, editor: { slide: true, range: [0, 1], step: 0.001 } }
+        progressAxis:   { value: 0.0, editor: { slide: true, range: [0, 1], step: 1.0 } }
+        progressInvert: { value: 0.0, editor: { slide: true, range: [0, 1], step: 1.0 } }
+  - name: transparent
+    passes:
+    - vert: progress-vs:vert
+      frag: progress-fs:frag
+      blendState:
+        targets:
+        - blend: true
+          blendSrc: src_alpha
+          blendDst: one_minus_src_alpha
+          blendSrcAlpha: src_alpha
+          blendDstAlpha: one_minus_src_alpha
+      properties: *props
+}%
+
+CCProgram progress-vs %{
+  precision highp float;
+  #include <cc-global>
+  #include <cc-local>
+
+  in vec3 a_position;
+  in vec2 a_texCoord;
+
+  out vec2 v_uv;
+  out vec3 v_position;
+
+  vec4 vert() {
+    vec4 pos = vec4(a_position, 1.0);
+    pos = cc_matWorld * pos;
+    pos = cc_matViewProj * pos;
+
+    v_uv = a_texCoord;
+    v_position = (cc_matWorld * vec4(a_position, 1.0)).xyz;
+    return pos;
+  }
+}%
+
+CCProgram progress-fs %{
+  precision highp float;
+  #include <legacy/output>
+
+  in vec2 v_uv;
+  in vec3 v_position;
+
+  uniform sampler2D mainTexture;
+
+  uniform Constant {
+    vec4 mainColor;
+    float progress;
+    float progressAxis;
+    float progressInvert;
+  };
+
+  vec4 frag() {
+    vec4 col = mainColor * texture(mainTexture, v_uv);
+
+    // 选择裁剪轴：0 = 水平(uv.x)，1 = 垂直(uv.y)
+    float axisVal = (progressAxis < 0.5) ? v_uv.x : v_uv.y;
+
+    // 反向开关：progressInvert = 1 时反转方向
+    if (progressInvert > 0.5) {
+      axisVal = 1.0 - axisVal;
+    }
+
+    // 超出进度范围的像素直接丢弃，形成裁剪
+    if (axisVal > progress) {
+      discard;
+    }
+
+    return CCFragOutput(col);
+  }
+}%

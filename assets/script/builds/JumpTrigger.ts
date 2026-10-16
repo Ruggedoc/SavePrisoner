@@ -1,4 +1,4 @@
-import { _decorator, BoxCollider, Component, Node, RigidBody, tween, Vec3, Animation, v3 } from "cc";
+import { _decorator, BoxCollider, Component, Node, RigidBody, tween, Vec3, Animation, v3, SphereCollider } from "cc";
 import { GameGlobal } from "../GameGlobal";
 const { ccclass, property } = _decorator;
 
@@ -10,8 +10,8 @@ export class JumpTrigger extends Component {
   bgWhite: Node;
   @property(Node)
   bgGreen: Node;
-  @property(BoxCollider)
-  jumpTrigger: BoxCollider;
+  @property(SphereCollider)
+  jumpTrigger: SphereCollider;
   @property(Node)
   normalNode: Node;
   @property(Node)
@@ -58,7 +58,8 @@ export class JumpTrigger extends Component {
       if (GameGlobal.actor.bag3.children.length > 0 || GameGlobal.actor.bag4.children.length > 0) return;
       GameGlobal.iceBoxList.isTriggerOpen = true;
       //   GameGlobal.iceBoxList.onJumpTrggerStart(self);
-      GameGlobal.actor.onJumpButton();
+      // GameGlobal.actor.onJumpButton();
+
     }
   }
   onTriggerExit(self) {

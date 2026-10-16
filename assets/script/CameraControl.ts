@@ -87,16 +87,15 @@ export class CameraControl extends Component {
     this.actorPos = this.tou.worldPosition.clone();
     let pos = new Vec3();
     Vec3.add(pos, this.actorPos, this.offsetPos);
-
     // this.node.setPosition(pos);
     this.followRoot.setPosition(pos);
     // this.followRoot.setPosition(this.actorPos);
   }
 
   cameraFollowForTarget(target: Node) {
-    if (this.offsetPos.x == 0) {
-      return;
-    }
+    // if (this.offsetPos.x == 0) {
+    //   return;
+    // }
     let targetPos = target.worldPosition.clone();
     let pos = new Vec3();
     Vec3.add(pos, targetPos, this.offsetPos);
@@ -194,6 +193,40 @@ export class CameraControl extends Component {
             GameGlobal.cameraMoving = false;
           })
           .start();
+      })
+      .start();
+  }
+
+  /**升高并移动到目标点 */
+  cameraMove5(targetNode: Node, toTime = 0.5, callback?) {
+    GameGlobal.cameraMoving = true;
+    let targetPos = targetNode.worldPosition.clone();
+    let targetPos2 = new Vec3(0, 0, 0);
+    Vec3.add(targetPos2, targetPos, this.offsetPos);
+    let targetFov = this.gameInitFov + 5;
+
+    tween(GameGlobal.mainCamera).to(toTime, { fov: targetFov }).start();
+
+    tween(this.followRoot)
+      .to(toTime, { worldPosition: targetPos2 })
+      .call(() => {
+        callback && callback();
+      })
+      .start();
+  }
+
+  /**降低FOV并回到原位 */
+  cameraMove6(backTime = 0.5, callback?) {
+    tween(GameGlobal.mainCamera).to(backTime, { fov: this.gameInitFov }).start();
+    let temmp = this.tou.worldPosition.clone();
+    let targetPos = new Vec3(temmp.x, 1.9, temmp.z);
+    let targetPos2 = new Vec3(0, 0, 0);
+    Vec3.add(targetPos2, targetPos, this.offsetPos);
+    tween(this.followRoot)
+      .to(backTime, { worldPosition: targetPos2 })
+      .call(() => {
+        callback && callback();
+        GameGlobal.cameraMoving = false;
       })
       .start();
   }

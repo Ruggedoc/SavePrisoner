@@ -7,8 +7,6 @@ const { ccclass, property } = _decorator;
 @ccclass("ActorAniCrl")
 export class ActorAniCrl extends Component {
   onThrowOne() {
-    // AudioManager.audioStop("move");
-    // AudioManager.soundPlay("throwNpc");
     GameGlobal.watarRoom.onThrowBody();
   }
   onThrowOneAudio() {
@@ -33,21 +31,15 @@ export class ActorAniCrl extends Component {
     GameGlobal.actor.tojump();
   }
   public onfootdown() {
-    // GameGlobal.actor.isJump = false;
-    // GameGlobal.iceBoxList.onTrggerStart();
-    // GameGlobal.actor.onJumpFinish();
+    // GameGlobal.actor.onFistJumpAni();
     GameGlobal.iceBoxList.onButtonAni();
+    // GameGlobal.iceBoxList.onFistJumpAni();
   }
 
   public onjumpdown() {
-    GameGlobal.actor.isJump = false;
-    // GameGlobal.iceBoxList.onTrggerStay();
-    // GameGlobal.actor.onJumpFinish();
+    GameGlobal.actor.onJumpFinish();
   }
 
   public onjumpdown2() {
-    // GameGlobal.actor.isJump = false;
-    // GameGlobal.iceBoxList.onTrggerStay();
-    // GameGlobal.actor.onJumpFinish2();
   }
 }

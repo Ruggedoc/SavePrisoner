@@ -1,4 +1,4 @@
-import { _decorator, BoxCollider, Node, Component, math, tween, Tween, Vec3, Prefab, instantiate, Quat } from "cc";
+import { _decorator, BoxCollider, Animation, Node, Component, math, tween, Tween, Vec3, Prefab, instantiate, Quat } from "cc";
 import { Utils } from "../Utils";
 import { GameGlobal } from "../GameGlobal";
 
@@ -10,8 +10,6 @@ export class IceBox extends Component {
   public bodyList: Node;
   @property(Node)
   public iceLoader: Node;
-  @property(Node)
-  public tempBreakEffect: Node;
   @property(Prefab)
   public npcPfb: Prefab;
 
@@ -44,7 +42,6 @@ export class IceBox extends Component {
       let bodyMod = temp.getChildByName("bodyMod");
       bodyMod.setRotationFromEuler(new Vec3(Utils.randomRange(80, 100), 90, Utils.randomRange(0, 180)));
     }
-    this.tempBreakEffect.active = false;
   }
 
   initNpc() {
@@ -57,15 +54,7 @@ export class IceBox extends Component {
   /**碎冰特效 */
   public onPlayeIceBreakAni() {
     this.iceLoader.active = false;
-    // this.tempBreakEffect.active = true;
-    // this.scheduleOnce(() => {
-    //   // this.destroy();
-    //   // GameGlobal.iceBoxList.addPoolItem(this.node);
-    //   this.tempBreakEffect.active = false;
-    //   // this.iceLoader.active = true;
-    //   // GameGlobal.isBodyReady = true;
-    // }, 2);
-  } 
+  }
 
   /**尸体 */
   public onPlaySaveAni() {

@@ -4,6 +4,7 @@ import { GameGlobal } from "../GameGlobal";
 import { Moeny } from "./Moeny";
 import { Npc } from "../actor/Npc";
 import { ActorFlyAttribute } from "../actor/ActorFlyAttribute";
+import { GamePool } from "../GamePool";
 const { ccclass, property } = _decorator;
 
 @ccclass("EquipConter")
@@ -17,10 +18,12 @@ export class EquipConter extends Component {
   private coinOffestY: number = 0.084;
 
   npcPayMoneyArr: Node[] = [];
-  actorTakeMoneyArr: Node[] = []; 
+  actorTakeMoneyArr: Node[] = [];
 
   anim: SkeletalAnimation;
   currAnim: string;
+  /**npc扔金币飞的高度 */
+  UpY: number = 3;
 
   start() {
     GameGlobal.equipConter = this;
@@ -53,7 +56,7 @@ export class EquipConter extends Component {
 
         let controlPos = new Vec3(
           (nodeSrc.cunterStartPos.x + targetPos.x) / 2,
-          Math.max(nodeSrc.cunterStartPos.y, targetPos.y) + 1, // 保持一定高度
+          Math.max(nodeSrc.cunterStartPos.y, targetPos.y) + this.UpY, // 保持一定高度
           (nodeSrc.cunterStartPos.z + targetPos.z) / 2,
         );
 
@@ -115,8 +118,13 @@ export class EquipConter extends Component {
           nodeSrc.isMoveb = false;
           nodeSrc.isConterLeave = false;
           n.setWorldPosition(tempPos);
-          n.setParent(GameGlobal.actor.bag2);
-          n.eulerAngles = Vec3.ZERO;
+          if (GameGlobal.actor.bag2.children.length >= GameGlobal.moneyConterMax) {
+            n.removeFromParent();
+            GamePool.inst.poolPut("Money", n);
+          } else {
+            n.setParent(GameGlobal.actor.bag2);
+            n.eulerAngles = Vec3.ZERO;
+          }
           GameGlobal.actor.checkBagPos();
           GameGlobal.actor.cleanBag();
           GameGlobal.mainGame.updateMoney();

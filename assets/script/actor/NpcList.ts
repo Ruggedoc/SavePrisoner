@@ -2,12 +2,14 @@ import { _decorator, Component, Node, Vec3 } from "cc";
 import { GameGlobal } from "../GameGlobal";
 import { Utils } from "../Utils";
 import { Npc } from "./Npc";
-import { NpcState, NpcWorkStage } from "../EnumDefine";
+import { NpcFashion, NpcState, NpcWorkStage } from "../EnumDefine";
 import { AudioManager } from "../AudioManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("NpcList")
 export class NpcList extends Component {
+  /**浴巾女囚 */
+  public npcTowelArr: Node[] = [];
   /**正在排队的人坐标 */
   public mansPos: Vec3[] = [];
   /**进入排队点 */
@@ -120,28 +122,27 @@ export class NpcList extends Component {
   }
 
   public checkAndEnterList(n: Node) {
-    let npcSrc: Npc = null;
     if (
       this.npcListArr.length >= GameGlobal.cunterListMax ||
       (this.npcWaitEnterArr.length > 0 && this.npcListArr.length < GameGlobal.cunterListMax)
     ) {
-      npcSrc = n.getComponent(Npc);
-      let npcWaitPos = GameGlobal.mainGame.GamePosNode.getChildByName("NpcWaitPos");
-      let maxWaitPos = Utils.localToWorld(npcWaitPos.parent, GameGlobal.npcWaitAreaMaxPos);
-      let waitPos = new Vec3(
+      const npcSrc1 = n.getComponent(Npc);
+      const npcWaitPos = GameGlobal.mainGame.GamePosNode.getChildByName("NpcWaitPos");
+      const maxWaitPos = Utils.localToWorld(npcWaitPos.parent, GameGlobal.npcWaitAreaMaxPos);
+      const waitPos = new Vec3(
         Utils.randomRange(npcWaitPos.worldPosition.x, maxWaitPos.x),
         0,
         Utils.randomRange(npcWaitPos.worldPosition.z, maxWaitPos.z),
       );
-      npcSrc.curMovePos = waitPos;
-      npcSrc.workStage = NpcWorkStage.waitList;
-      npcSrc.state = NpcState.move;
+      npcSrc1.curMovePos = waitPos;
+      npcSrc1.workStage = NpcWorkStage.waitList;
+      npcSrc1.state = NpcState.move;
       this.npcWaitEnterArr.push(n);
     } else {
-      npcSrc = n.getComponent(Npc);
-      npcSrc.curMovePos = GameGlobal.npcList.getListEnterPos(this.node.worldPosition.clone());
-      npcSrc.workStage = NpcWorkStage.enterNpcList;
-      npcSrc.state = NpcState.move;
+      const npcSrc2 = n.getComponent(Npc);
+      npcSrc2.curMovePos = GameGlobal.npcList.getListEnterPos(this.node.worldPosition.clone());
+      npcSrc2.workStage = NpcWorkStage.enterNpcList;
+      npcSrc2.state = NpcState.move;
     }
   }
 
@@ -155,5 +156,20 @@ export class NpcList extends Component {
       npcSrc.workStage = NpcWorkStage.enterNpcList;
       npcSrc.state = NpcState.move;
     }
+  }
+
+  /**添加浴巾女囚犯到队列 */
+  public addTowelNpc(n: Node) {
+    this.npcTowelArr.push(n);
+  }
+
+  /**从浴巾队列中移除指定NPC */
+  public removeTowelNpc(n: Node) {
+    this.npcTowelArr = this.npcTowelArr.filter((item) => item.uuid != n.uuid);
+  }
+
+  /**是否有浴巾女囚犯在排队、去往柜台 */
+  public get isHaveNpcToCounter() {
+    return this.npcTowelArr.length > 0;
   }
 }

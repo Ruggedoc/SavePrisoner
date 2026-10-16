@@ -22,13 +22,12 @@ import { Npc } from "../actor/Npc";
 import { Utils } from "../Utils";
 import { DissolveController } from "../actor/DissolveController";
 import { AudioManager } from "../AudioManager";
+import { GamePool } from "../GamePool";
 const { ccclass, property } = _decorator;
 
 @ccclass("Spr")
 export class Spr extends Component {
   // ==================== 编辑器属性 ====================
-  @property(Prefab)
-  hitfab: Prefab;
   @property(ProgressBar)
   bloodBarComp: ProgressBar;
   @property(Prefab)
@@ -54,8 +53,6 @@ export class Spr extends Component {
 
   public hp = 0;
   public hpmax = 2;
-  public bjjilv = 40;
-  public propjilv = 100;
 
   public attcdTime = 0;
   public attTime = 0;
@@ -115,9 +112,15 @@ export class Spr extends Component {
 
   // ==================== 公开方法 ====================
 
-  init(max: number) {
-    this.hpmax = max;
-    this.hp = max;
+  initData() {
+    this.hpmax = 1;
+    this.hp = 1;
+    this.isHit = false;
+    this.isDeath = false;
+    this.isDeathClearFinish = false;
+    this.hasDeathTriggered = false;
+    this.isHitBack = false;
+    this.hitTime = 0;
   }
 
   /** 外部通过减血来触发死亡 */
@@ -349,8 +352,15 @@ export class Spr extends Component {
 
     if (this.node && this.node.isValid) {
       GameGlobal.monsterDeathArr.push(this.idlePos.clone());
-      this.node.removeFromParent();
-      this.node.destroy();
+      if (GamePool.inst) {
+        this.anim.stop();
+        this.node.removeFromParent();
+        const dissolveCtrl = this.shaderNod.getComponent(DissolveController);
+        dissolveCtrl.initValue();
+        GamePool.inst.poolPut("LaoShu", this.node);
+      } else {
+        this.node.destroy();
+      }
     }
     this.isDeathClearFinish = true;
   }
@@ -367,16 +377,23 @@ export class Spr extends Component {
       const x = r * Math.cos(angle);
       const z = r * Math.sin(angle);
 
-      const propNode = instantiate(this.moneyfab);
+      const propNode = GamePool.inst.poolGet("Money");
+      const moneySrc = propNode.getComponent(Moeny);
+      moneySrc.initData();
+
+      moneySrc.isready = false;
+      moneySrc.isMoveb = true;
       const worldPos = this.node.worldPosition.clone();
       propNode.parent = propList;
       propNode.worldPosition = worldPos;
 
-      const moneySrc = propNode.getComponent(Moeny);
       const targetPos = v3(worldPos.x + x, 0, worldPos.z + z);
       const targetEuler = new Vec3(0, Utils.randomRange(0, 360), 0);
       propNode.eulerAngles = targetEuler;
-      moneySrc.moveToPos(true, targetPos, 0.25, new Vec3(0, 2, 0), () => {});
+      moneySrc.moveToPos(true, targetPos, 0.25, new Vec3(0, 2, 0), () => {
+        moneySrc.isready = true;
+        moneySrc.isMoveb = false;
+      });
     }
   }
 

@@ -59,6 +59,7 @@ export class JianTou2DGuide extends Component {
   curNode3DArrow: Node = null;
 
   curNode3DArrowAni: Animation = null;
+  isAniPlaying: boolean = false;
   isChange: boolean = false;
 
   /** 2D箭头实例池（预创建，用 active 显隐） */
@@ -232,17 +233,28 @@ export class JianTou2DGuide extends Component {
       }
     }
     // if (this.isChange) {
-      if (this.curNode != null) {
-        shouldShow = this.is3DEnable && !this.isPause;
-        // if (shouldShow == true) this.curNode3DArrowAni.play("jianTou");
-        // else this.curNode3DArrowAni.stop();
-        this.curNode3DArrow.worldPosition = new Vec3(this.curNode.worldPosition.x, this.curPosY, this.curNode.worldPosition.z);
-        this.curNode3DArrow.active = shouldShow;
-      } else {
-        this.curNode3DArrowAni.stop();
-        this.curNode3DArrow.active = false;
+    if (this.curNode != null) {
+      shouldShow = this.is3DEnable && !this.isPause;
+      // if (shouldShow == true) this.curNode3DArrowAni.play("jianTou");
+      // else this.curNode3DArrowAni.stop();
+      if (!this.isAniPlaying) {
+        this.isAniPlaying = true;
+        this.curNode3DArrowAni.play("jianTou");
       }
+      this.curNode3DArrow.worldPosition = new Vec3(this.curNode.worldPosition.x, this.curPosY, this.curNode.worldPosition.z);
+      this.curNode3DArrow.active = shouldShow;
+    } else {
+      this.curNode3DArrowAni.stop();
+      this.isAniPlaying = false;
+      this.curNode3DArrow.active = false;
+    }
     // }
+  }
+
+  /** 设置3D箭头 Y 轴位置 */
+  set3DArrowPosY(posY: number) {
+    this.curPosY = posY;
+    this.curNode3DArrow.worldPosition = new Vec3(this.curNode.worldPosition.x, this.curPosY, this.curNode.worldPosition.z);
   }
 
   //#region 设置2D箭头显示

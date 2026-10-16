@@ -19,6 +19,7 @@ import {
   EffectAsset,
   BoxCollider,
   CapsuleCollider,
+  Tween,
 } from "cc";
 import { Utils } from "../Utils";
 import { GameGlobal } from "../GameGlobal";
@@ -28,6 +29,8 @@ import { NpcAniState, NpcFashion, NpcState, NpcWorkStage } from "../EnumDefine";
 import { Moeny } from "../builds/Moeny";
 import { DissolveController } from "./DissolveController";
 import { AudioManager } from "../AudioManager";
+import { NpcBarParam } from "../UI3d/NpcBarParam";
+import { GamePool } from "../GamePool";
 
 const { ccclass, property } = _decorator;
 
@@ -57,12 +60,12 @@ export class Npc extends Component {
   @property(Node)
   hitEfc: Node;
   @property(Prefab)
-  biaoq: Prefab;
+  topBiaoqing: Prefab;
 
-  public BGback: Node;
-  uiCoolBar: Node;
-  smileBGNode: Node;
-  smileNode: Node;
+  cooltimeBarNode: Node = null;
+  public BGback: Node = null;
+  smileBGNode: Node = null;
+  smileNode: Node = null;
 
   selfCollider: CapsuleCollider;
   selfRigidBody: RigidBody;
@@ -70,7 +73,7 @@ export class Npc extends Component {
   private smileAni: Animation;
 
   /**当前衣服(模型)状态 */
-  public currShowNpc: number = 0; //0冰人 1浴巾 2囚服
+  public currShowNpc: NpcFashion = 0; //0冰人 1浴巾 2囚服
   equipMod: Node; //囚服模型
   equipWeapon: Node; //囚服模型武器
   towelMod: Node; //浴巾模型
@@ -120,7 +123,7 @@ export class Npc extends Component {
   public toBattleArr: Vec3[];
 
   public coinNum: number = 0; //金币数计数
-  public takeOffTime: number = 0.02; //扔钱间隔时间
+  public takeOffTime: number = 0.05; //扔钱间隔时间
   public coinTime: number = 0; //时间计数
 
   private attCd: number = 0.5; //攻击冷却时间
@@ -154,18 +157,56 @@ export class Npc extends Component {
     this.selfCollider.isTrigger = true;
     this.selfRigidBody.enabled = false;
     this.attTriggerNode.active = false;
+  }
 
-    let biaoqNode = instantiate(this.biaoq);
-    biaoqNode.parent = GameGlobal.mainGame.node.getChildByName("iconList");
-    biaoqNode.getComponent(CooltimeBar).target = this.node.getChildByName("HeadAnchor");
-    this.BGback = biaoqNode.getChildByName("BG");
-    this.smileBGNode = biaoqNode.getChildByName("smileBg");
-    this.smileNode = biaoqNode.getChildByName("smile");
+  initData() {
+    this.coinTime = 0;
+    this.coinNum = 0;
+    this.toBattleIdx = 0;
+    this.isDeath = false;
+    this.isBattle = false;
+    this.curMovePos = null;
+    this.enemyList = [];
+    this.curHp = 2;
+    this.moveDis = 0.1;
+    this.isready = true;
+    this.attackEfc.active = false;
+    this.equipMod = this.node.getChildByName("bodyMod").getChildByName("equip");
+    this.towelMod = this.node.getChildByName("bodyMod").getChildByName("towel");
+    this.iceMod = this.node.getChildByName("bodyMod").getChildByName("ice");
+    this.selfCollider = this.node.getComponent(CapsuleCollider);
+    this.selfRigidBody = this.node.getComponent(RigidBody);
+    this.selfCollider.isTrigger = true;
+    this.selfRigidBody.enabled = false;
+    this.attTriggerNode.active = false;
+    this.setNpcFashion(0);
+
+    this.scheduleOnce(() => {
+      this.setTopBarData();
+    }, 1);
+  }
+
+  initShader() {
+    this.iceMod.getComponent(DissolveController).initValue();
+    this.equipMod.getComponent(DissolveController).initValue();
+    this.weaponShader.getComponent(DissolveController).initValue();
+  }
+
+  setTopBarData() {
+    this.cooltimeBarNode = instantiate(this.topBiaoqing);
+    let paramSrc = this.cooltimeBarNode.getComponent(NpcBarParam);
+    let cooltimeBarSrc = this.cooltimeBarNode.getComponent(CooltimeBar);
+    cooltimeBarSrc.target = this.node.getChildByName("HeadAnchor");
+    paramSrc.setParentNpcNode(this.node);
+    this.cooltimeBarNode.parent = GameGlobal.mainGame.node.getChildByName("iconList");
+    // topBarNode.getComponent(CooltimeBar).target = this.node.getChildByName("HeadAnchor");
+    this.BGback = this.cooltimeBarNode.getChildByName("BG");
+    this.smileBGNode = this.cooltimeBarNode.getChildByName("smileBg");
+    this.smileNode = this.cooltimeBarNode.getChildByName("smile");
     this.smileAni = this.smileNode.getComponent(Animation);
     this.timeDownBar = this.BGback.getChildByName("ProgressBar").getComponent(ProgressBar);
     this.BGback.active = false;
     this.timeDownBar.progress = 0;
-
     this.smileBGNode.active = false;
     this.smileNode.active = false;
   }
@@ -602,6 +643,16 @@ export class Npc extends Component {
     }
     // if (!GameGlobal.actor.isattMap) return;
     // AudioManager.soundPlay("sprHit3");
+    // if (GameGlobal.isFirstThrow) {
+    //   GameGlobal.isFirstThrow = false;
+    //   if (GameGlobal.watarRoom.YDFollowNpc != null) {
+    //     this.scheduleOnce(() => {
+    //       GameGlobal.watarRoom.YDFollowStart = false;
+    //       GameGlobal.watarRoom.YDFollowNpc = null;
+    //       GameGlobal.CameraControl.cameraMoveToActor();
+    //     }, 0.8);
+    //   }
+    // }
     GameGlobal.bHaveNpcAttack = true;
   }
 
@@ -649,10 +700,20 @@ export class Npc extends Component {
       this.equipMod.getComponent(DissolveController).dissolveAllMat(2, () => {
         // if (this.targetAtt != null) this.targetAtt.getComponent(Spr).targetNode = null;
         this.clearTarget();
-        this.node.removeFromParent();
-        this.node.destroy();
+        // this.node.removeFromParent();
+        // this.node.destroy();
       });
       this.weaponShader.getComponent(DissolveController).dissolveAllMat(2);
+      this.scheduleOnce(() => {
+        if (GamePool.inst) {
+          Tween.stopAllByTarget(this.node);
+          this.node.removeFromParent();
+          this.initShader();
+          GamePool.inst.poolPut("Npc", this.node);
+        } else {
+          this.node.destroy();
+        }
+      }, 2.2);
     });
     if (!GameGlobal.actor.isattMap) return;
     AudioManager.soundPlay("npcDeath");
@@ -699,9 +760,9 @@ export class Npc extends Component {
     halfCallBack?,
   ) {
     let isHalfRun = false;
-    let startPos = n.position.clone();
-    let tempVec3 = new Vec3(0, 0, 0);
-    let controlPos = new Vec3(0, 0, 0);
+    const startPos = n.position.clone();
+    const tempVec3 = new Vec3(0, 0, 0);
+    const controlPos = new Vec3(0, 0, 0);
     Vec3.add(controlPos, startPos, pos);
     controlPos.multiplyScalar(0.5);
     controlPos.add3f(midPos.x, midPos.y, midPos.z);
@@ -725,7 +786,7 @@ export class Npc extends Component {
       })
       .call(() => {
         if (isJelly) {
-          let initScale = n.scale.clone();
+          const initScale = n.scale.clone();
           Utils.jellyEffect(n, initScale.x, () => {
             n.setWorldScale(Vec3.ONE);
           });
@@ -788,24 +849,37 @@ export class Npc extends Component {
     this.saveEfc.active = true;
     this.BGback.active = true;
     this.smileNode.active = true;
-    let npcSrc = n.getComponent(Npc);
+    const npcSrc = n.getComponent(Npc);
 
     this.towelMod.active = true;
     npcSrc.anim0.play(NpcAniState.ice2);
     npcSrc.anim1.play(NpcAniState.ice2);
     n.getChildByName("bodyMod").eulerAngles = Vec3.ZERO;
     n.getChildByName("bodyMod").position = new Vec3(0, 1, 0);
-
-    npcSrc.iceMod.getComponent(DissolveController).initValue();
-    npcSrc.iceMod.getComponent(DissolveController).dissolve(3);
+    this.scheduleOnce(() => {
+      npcSrc.iceMod.getComponent(DissolveController).initValue();
+      npcSrc.iceMod.getComponent(DissolveController).dissolve(GameGlobal.throwingBodyTime + 1);
+    });
 
     if (GameGlobal.actor.isWarterAduioMap) {
       AudioManager.soundPlay("npcSign");
     }
+    if (GameGlobal.throwingBodyTime == 1) {
+      if (!GameGlobal.throwingTimeAddTag) {
+        GameGlobal.throwingTimeAddTag = true;
+        this.scheduleOnce(() => {
+          GameGlobal.throwingBodyTime = 2;
+        }, 2);
+      }
+    }
+    console.log("时间" + GameGlobal.throwingBodyTime);
     this.smileAni.play("emojiS");
     this.smileAni.once(Animation.EventType.FINISHED, () => {
       this.smileNode.active = false;
       this.smileBGNode.active = false;
+      this.cooltimeBarNode.removeFromParent();
+      this.cooltimeBarNode.destroy();
+      // GameGlobal.npcBarList.onClearBar(n);
     });
 
     this.progressTween = tween(this.timeDownBar)
@@ -816,22 +890,21 @@ export class Npc extends Component {
         this.saveEfc.active = false;
         this.BGback.active = false;
         this.smileBGNode.active = true;
-        let targetPos = new Vec3(0, 0, 0);
-        let pos = this.getThrowTargetPos();
-        let tempPos = n.worldPosition.clone();
-        targetPos = Utils.localToWorld(n.parent, pos);
+        const targetPos = new Vec3(0, 0, 0);
+        const pos = this.getThrowTargetPos();
+        const tempPos = n.worldPosition.clone();
+        targetPos.set(Utils.localToWorld(n.parent, pos));
         n.setParent(GameGlobal.mainGame.SprListNode.getChildByName("npcList"));
         n.worldPosition = tempPos;
         npcSrc.setNpcFashion(NpcFashion.towel);
+        GameGlobal.npcList.addTowelNpc(n);
 
-        let targetVec3 = new Vec3(0, 0, 0);
+        const targetVec3 = new Vec3(0, 0, 0);
         if (!GameGlobal.bOpenPool) {
-          targetVec3 = npcSrc.inWaterIdx == 0 ? new Vec3(0, 270, 0) : new Vec3(0, -90, 0);
+          targetVec3.set(npcSrc.inWaterIdx == 0 ? new Vec3(0, 270, 0) : new Vec3(0, -90, 0));
         }
-
         this.moveToPos(n, targetPos, 0.3, 0, false, true, targetVec3, () => {
           //人物行走？
-          GameGlobal.curWaterBody--;
           // this.smileNode.parent.active = true;
           // this.smileAni.play("hot");
           // this.smileAni.play("emojiS");
@@ -857,14 +930,29 @@ export class Npc extends Component {
       this.coinNum = 0;
       this.coinTime = 0;
       this.setNpcFashion(NpcFashion.equip);
+
       if (!GameGlobal.actor.isattMap) AudioManager.soundPlay("npcEquip");
       this.equipWeapon.active = true;
       this.equipEfc.active = true;
       this.scheduleOnce(() => {
+        this.equipEfc.active = false;
+      }, 2);
+      this.scheduleOnce(() => {
         GameGlobal.npcList.onEquipEnd();
+        GameGlobal.npcList.removeTowelNpc(this.node);
       }, 0.15);
       this.workStage = NpcWorkStage.toBattle;
       this.onStateCenter();
+      if (GameGlobal.isFirstThrow) {
+        GameGlobal.isFirstThrow = false;
+        if (GameGlobal.watarRoom.YDFollowNpc != null) {
+          this.scheduleOnce(() => {
+            GameGlobal.watarRoom.YDFollowStart = false;
+            GameGlobal.watarRoom.YDFollowNpc = null;
+            GameGlobal.CameraControl.cameraMoveToActor();
+          }, 0.5);
+        }
+      }
       return;
     }
     this.coinTime += dt;
@@ -876,9 +964,10 @@ export class Npc extends Component {
 
     //一次扔两个钱
     let startPos1 = this.coinPosNode.worldPosition.clone();
-    let propNode1 = instantiate(this.moneyPfb);
-    propNode1.worldPosition = new Vec3(0, -1, 0);
+    let propNode1 = GamePool.inst.poolGet("Money");
     let moneySrc1 = propNode1.getComponent(Moeny);
+    moneySrc1.initData();
+    propNode1.worldPosition = new Vec3(0, -1, 0);
     moneySrc1.isready = false;
     moneySrc1.isMoveb = true;
     propNode1.worldPosition = startPos1;
@@ -894,9 +983,11 @@ export class Npc extends Component {
 
     //有可能扔多了，做个检查
     if (curAdd > 1) {
-      let propNode2 = instantiate(this.moneyPfb);
-      propNode2.worldPosition = new Vec3(0, -1, 0);
+      let propNode2 = GamePool.inst.poolGet("Money");
       let moneySrc2 = propNode2.getComponent(Moeny);
+      moneySrc2.initData();
+
+      propNode2.worldPosition = new Vec3(0, -1, 0);
       moneySrc2.isready = false;
       moneySrc2.isMoveb = true;
 
@@ -917,6 +1008,11 @@ export class Npc extends Component {
     this.iceMod.active = tag == NpcFashion.ice;
     this.towelMod.active = tag == NpcFashion.towel;
     this.equipMod.active = tag == NpcFashion.equip;
+    if (tag == NpcFashion.towel) {
+      if (GameGlobal.haveTowelNpc == false) {
+        GameGlobal.haveTowelNpc = true;
+      }
+    }
   }
 
   //#region 动画播放方法

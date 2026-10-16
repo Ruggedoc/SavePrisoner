@@ -20,14 +20,18 @@ export class DissolveController extends Component {
   }
 
   initValue() {
-    const material = this.meshRenderer.getMaterialInstance(0);
-    material.setProperty("dissolveThresholdValue", 0);
+    // const material = this.meshRenderer.getMaterialInstance(0);
+    // material.setProperty("dissolveThresholdValue", 0);
+    const materials = this.meshRenderer.materials;
+    for (let material of materials) {
+      material.setProperty("dissolveThresholdValue", 0);
+    }
   }
 
   update(deltaTime: number) {}
 
   dissolve(time, callback?) {
-    const material = this.meshRenderer.getMaterialInstance(0);
+    const material = this.meshRenderer.materials[0];
     material.setProperty("dissolveColor1", this.dissolveColor);
     material.setProperty("dissolveColor2", this.dissolveColor);
     tween(this.dissolveProgress)

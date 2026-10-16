@@ -1,4 +1,4 @@
-import { _decorator, Camera, Node, Vec3 } from "cc";
+import { _decorator, Camera, Node, Tween, Vec3 } from "cc";
 import { MainGame } from "./MainGame";
 import { CameraControl } from "./CameraControl";
 import { CoinNumber } from "./CoinNumber";
@@ -12,6 +12,7 @@ import { BagOffset } from "./actor/BagOffset";
 import { JianTou2DGuide } from "./actor/JianTou2DGuide";
 import { NpcList } from "./actor/NpcList";
 import { FMPlayer } from "./actor/FMPlayer";
+import { NpcBarList } from "./UI3d/NpcBarList";
 
 export class GameGlobal {
   public static mainGame: MainGame;
@@ -38,6 +39,7 @@ export class GameGlobal {
   /*********子弹生产线*********/
   public static isOver = false; //游戏是否结束
   public static isStop = false; //游戏是否暂停
+  public static isGM: boolean = true; //是否是GM
 
   //** 重生PL192_复刻解冻治疗囚犯战斗$模拟经营*/
   public static iconValue = 10; //金币价值
@@ -143,10 +145,6 @@ export class GameGlobal {
    */
   public static bodyPosSet: Set<{}> = new Set();
   /**
-   * 当前携带尸体
-   */
-  public static curTakeBody: number = 0;
-  /**
    * 背包三尸体坐标
    */
   public static curTakeBodyPos1: Vec3 = new Vec3(-0.05, 0.72, -0.3);
@@ -175,10 +173,6 @@ export class GameGlobal {
    */
   public static takeBodyMax2: number = 6;
   /**
-   * //当前水里的尸体
-   */
-  public static curWaterBody: number = 0;
-  /**
    * //水罐解冻上限
    */
   public static waterOpenMax1: number = 2;
@@ -201,7 +195,8 @@ export class GameGlobal {
   /**
    * 尸体解冻时间
    */
-  public static throwingBodyTime: number = 2;
+  public static throwingBodyTime: number = 1;
+  public static throwingTimeAddTag = false;
   /**
    * 水里的目标点--2个状态下
    */
@@ -304,7 +299,7 @@ export class GameGlobal {
   public static takeCount = 2;
 
   //NPC扔金币时金币的速度
-  public static paySpeed = 5;
+  public static paySpeed = 2.5;
 
   //柜台排队的上限
   public static cunterListMax = 12;
@@ -319,8 +314,22 @@ export class GameGlobal {
   public static audioPlayInterval: number = 1;
   //锤子解锁强制引导去踩一次
   public static YDHummerOpen: boolean = false;
+  //锤子解锁强制引导镜头去一趟
+  public static YDHummerOpenCamera: boolean = false;
   //车解锁强制引导去装一次尸体
   public static YDCarOpen: boolean = false;
-  //车解锁强制引导去装一次尸体
-  public static YDCarOpenState: number = 0;
+  //车扔尸体步骤
+  public static YDCarThrowState: number = 0;
+  //水池解锁强制引导去装一次尸体
+  public static YDPoolOpen: boolean = false;
+
+  //引导摄像头跟随其他角色
+  public static YDFollowOther: boolean = false;
+  //Npc头顶Ui
+  public static npcBarList: NpcBarList;
+
+  //正在地贴付钱
+  public static isPayDiTie: boolean = false;
+  //是否有浴巾女囚犯在排队、去往柜台
+  public static haveTowelNpc: boolean = false;
 }

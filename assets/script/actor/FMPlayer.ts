@@ -11,6 +11,8 @@ const { ccclass, property } = _decorator;
 export class FMPlayer extends Component {
   @property(Node)
   tou: Node;
+  @property(Node)
+  showEfc: Node;
   //移动相关
   _currPos: Vec3 = new Vec3();
   tempV3 = new Vec3();
@@ -97,6 +99,9 @@ export class FMPlayer extends Component {
     GameGlobal.FMPlayer.isYDNpcMove = true; //开启摄像机引导
     GameGlobal.bPlayerOpen = true;
     GameGlobal.cameraMoving = true;
+    this.scheduleOnce(()=>{
+      this.showEfc.active = true;
+    },0.3);
   }
 
   update(dt: number) {
@@ -209,7 +214,7 @@ export class FMPlayer extends Component {
 
   //装尸体
   public onTakeBody(dt) {
-    if (GameGlobal.curPlayTakeBody >= GameGlobal.takeBodyMax2) {
+    if (this.bodyTakePos.children.length >= GameGlobal.takeBodyMax2) {
       this.state = 2;
       return;
     }
@@ -242,7 +247,7 @@ export class FMPlayer extends Component {
     let tLen = this.bodyTakePos.children.length;
     let muSrc = tempNode.getComponent(Npc);
 
-    GameGlobal.curPlayTakeBody++;
+    // GameGlobal.curPlayTakeBody++;
     muSrc.isready = false;
 
     let targetLocalPos = this.playerTakeNpcPos[tLen];
@@ -302,8 +307,6 @@ export class FMPlayer extends Component {
 
     let bodyNode: Node = this.bodyTakePos.children[0];
     if (bodyNode != null) {
-      GameGlobal.curWaterBody++;
-      GameGlobal.curPlayTakeBody--;
       let posObject = GameGlobal.watarRoom.getThrowTargetPos();
       let targetPos = posObject.pos;
       let targetRos = GameGlobal.watarRoom.getThrowTargetRot();
@@ -314,9 +317,6 @@ export class FMPlayer extends Component {
       bodyNode.setParent(GameGlobal.watarRoom.pan);
       bodyNode.worldPosition = worldPos;
       bodyNode.worldRotation = worldRot;
-      // let bodyMod: Node = bodyNode.getChildByName("bodyMod");
-      // bodyNode.setRotationFromEuler(0, 0, 0);
-      // bodyMod.setRotationFromEuler(0, 0, 0);
       bodyNode.worldScale = Vec3.ONE;
       bodySrc.moveToPos(
         bodyNode,
@@ -327,7 +327,6 @@ export class FMPlayer extends Component {
         true,
         targetRos,
         () => {
-          // AudioManager.soundPlay("jumpWater");
           this.scheduleOnce(() => {
             bodySrc.onPlayDefrostAni(bodyNode, () => {});
           }, 0.2);
@@ -338,7 +337,6 @@ export class FMPlayer extends Component {
           GameGlobal.watarRoom.playWaterEffect(posObject.index);
         },
       );
-      // AudioManager.soundPlay("throwNpc");
     }
   }
 

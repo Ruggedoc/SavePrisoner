@@ -3,6 +3,7 @@ import { GameGlobal } from "../GameGlobal";
 import { Spr } from "./Spr";
 import { MonsterState, StateSpr } from "../EnumDefine";
 import { AudioManager } from "../AudioManager";
+import { GamePool } from "../GamePool";
 const { ccclass, property } = _decorator;
 
 @ccclass("sprlist")
@@ -106,12 +107,12 @@ export class sprlist extends Component {
   //初始第一次刷怪
   public initSpr() {
     for (let i = 0; i < GameGlobal.monsterIdlePosArr.length; i++) {
-      let SprNode = instantiate(this.sprfab);
+      let SprNode = GamePool.inst.poolGet('LaoShu');
       let sprSrc = SprNode.getComponent(Spr);
+      sprSrc.initData();
       SprNode.parent = this.node;
       SprNode.worldPosition = GameGlobal.monsterIdlePosArr[i];
       sprSrc.idlePos = GameGlobal.monsterIdlePosArr[i];
-      sprSrc.init(1);
       sprSrc.isRandomMove = true;
       // this.scheduleOnce(() => {
       //   sprSrc.state = MonsterState.idle;
@@ -121,12 +122,12 @@ export class sprlist extends Component {
 
   //添加刷怪
   public addSpr(pos: Vec3) {
-    let SprNode = instantiate(this.sprfab);
+    let SprNode = GamePool.inst.poolGet('LaoShu');
     let sprSrc = SprNode.getComponent(Spr);
+    sprSrc.initData();
     SprNode.parent = this.node;
     SprNode.worldPosition = this.getinitPos(pos);
     sprSrc.idlePos = pos;
-    sprSrc.init(1);
     sprSrc.state = MonsterState.idle;
     // this.scheduleOnce(() => {
     //   sprSrc.animPlay(StateSpr.move);

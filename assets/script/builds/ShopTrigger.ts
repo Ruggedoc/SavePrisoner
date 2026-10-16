@@ -17,6 +17,7 @@ import { GameGlobal } from "../GameGlobal";
 import { AudioManager } from "../AudioManager";
 import { MainGame } from "../MainGame";
 import { Moeny } from "./Moeny";
+import { GamePool } from "../GamePool";
 const { ccclass, property } = _decorator;
 
 @ccclass("ShopTrigger")
@@ -103,13 +104,16 @@ export class ShopTrigger extends Component {
   moneySoundNum: number = 3;
   moneySoundCount: number = 0;
 
+  greenMeshRenderer: MeshRenderer = null;
+
   start() {
     this.collider = this.colliderNode.getComponent(BoxCollider);
     this.collider.on("onTriggerEnter", this.onTriggerEnter, this);
     this.collider.on("onTriggerStay", this.onTriggerStay, this);
     this.collider.on("onTriggerExit", this.onTriggerExit, this);
-    this.init();
     this.anim = this.node.getComponent(Animation);
+    this.greenMeshRenderer = this.green.getComponent(MeshRenderer);
+    this.init();
   }
 
   update(dt) {
@@ -233,6 +237,7 @@ export class ShopTrigger extends Component {
       this.bgGreen.active = false;
       this.writeScoreNode.active = true;
       this.redScoreNode.active = false;
+      GameGlobal.isPayDiTie = false;
       // this.node.getChildByName("Node").getChildByName("miaobian_g").active =
       //   false;
       // this.node.getChildByName("Node").getChildByName("miaobian_b").active =
@@ -285,14 +290,14 @@ export class ShopTrigger extends Component {
     if (this.node.name == "buyHummer") {
       let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerOpenPos");
       GameGlobal.CameraControl.cameraMoveToPosPingPong(muNode, () => {
+        AudioManager.soundPlay("dtShow");
         this.node.active = true;
         this.init();
       });
       GameGlobal.nextBuyDitie = this.node;
       // GameGlobal.nextBuyPrice = GameGlobal.buyIceNumMoney;
     } else if (this.node.name == "buyCar") {
-      this.node.active = true;
-      GameGlobal.CameraControl.cameraMoveToActor(0.5);
+      // GameGlobal.CameraControl.cameraMoveToActor(0.5);
       // let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("carOpenPos");
       // GameGlobal.CameraControl.cameraMove2(
       //   muNode,
@@ -310,10 +315,12 @@ export class ShopTrigger extends Component {
     } else if (this.node.name == "buyBigPool") {
       if (!MainGame.mymain.isOpenCarAni) {
         this.node.active = true;
+        AudioManager.soundPlay("dtShow");
         this.init();
       } else {
         this.init();
         let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("waterPool2");
+        AudioManager.soundPlay("dtShow");
         GameGlobal.CameraControl.cameraMove2(
           muNode,
           () => {
@@ -321,6 +328,9 @@ export class ShopTrigger extends Component {
             this.init();
             this.scheduleOnce(() => {
               GameGlobal.CameraControl.cameraMoveToActor(0.5);
+              if (GameGlobal.yindao.curYDId == 9) {
+                GameGlobal.yindao.curYDId++;
+              }
             }, 0.8);
           },
           0.7,
@@ -334,11 +344,17 @@ export class ShopTrigger extends Component {
       // GameGlobal.CameraControl.cameraMove2(
       //   muNode,
       //   () => {
-      this.node.active = true;
-      this.init();
+      AudioManager.soundPlay("dtShow");
+      this.scheduleOnce(() => {
+        this.node.active = true;
+        this.init();
+      }, 0.32);
       // this.scheduleOnce(() => {
       GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
         GameGlobal.poolAni = false;
+        if (GameGlobal.yindao.curYDId == 12) {
+          GameGlobal.yindao.curYDId++;
+        }
       });
       // }, 0.8);
       //   },
@@ -348,6 +364,7 @@ export class ShopTrigger extends Component {
       // GameGlobal.nextBuyPrice = GameGlobal.buyEPlayerMoney;
     } else if (this.node.name == "buyOver") {
       let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("overOpenPos");
+      AudioManager.soundPlay("dtShow");
       GameGlobal.CameraControl.cameraMove2(
         muNode,
         () => {
@@ -436,19 +453,29 @@ export class ShopTrigger extends Component {
       }
     }
 
-    let scale = this.num / this.maxNum;
-    this.green.setScale(0.45, 1, 0.45 * (1 - scale));
-    this.green.setPosition(0, 0, 2.2 * scale);
+    let scale = 1 - this.num / this.maxNum;
+    if (this.greenMeshRenderer == null) {
+      this.greenMeshRenderer = this.green.getComponent(MeshRenderer);
+    }
+    // this.green.setScale(0.48, 1, 0.48 * (1 - scale));
+    // this.green.setPosition(0, 0, 2.1 * scale);
+    const mats = this.greenMeshRenderer.materials;
+    if (Number.isNaN(scale)) scale = 0;
+    mats[0]?.setProperty("progress", scale);
+    this.greenMeshRenderer.materials = mats;
   }
 
   updateCoinNum(coin: number) {
     this.num -= coin;
     this.putTime = game.totalTime;
     if (this.num <= 0) this.num = 0;
-    let scale = this.num / this.maxNum;
+    let scale = 1 - this.num / this.maxNum;
     if (scale <= 0) scale = 0;
-    this.green.setScale(0.45, 1, 0.45 * (1 - scale));
-    this.green.setPosition(0, 0.02, 2.2 * scale);
+    // this.green.setScale(0.45, 1, 0.45 * (1 - scale));
+    // this.green.setPosition(0, 0.02, 2.2 * scale);
+    const mats = this.greenMeshRenderer.materials;
+    mats[0]?.setProperty("progress", scale);
+    this.greenMeshRenderer.materials = mats;
   }
 
   moveToDiTie() {
@@ -457,10 +484,10 @@ export class ShopTrigger extends Component {
       if (!this.isFirst1) return;
       this.isFirst1 = false;
       this.finish();
-      AudioManager.soundPlay("dtShow");
       this.onShowMoneyAtAni(false);
       this.bgWhite.active = true;
       this.bgGreen.active = false;
+      GameGlobal.isPayDiTie = false;
       return;
     }
     let baglength = GameGlobal.actor.bag2.children.length;
@@ -469,7 +496,11 @@ export class ShopTrigger extends Component {
       this.bgWhite.active = true;
       this.bgGreen.active = false;
       this.isRedEffect = true;
+      GameGlobal.isPayDiTie = false;
       return;
+    }
+    if (!GameGlobal.isPayDiTie) {
+      GameGlobal.isPayDiTie = true;
     }
     this.redScoreNode.active = false;
     this.bgWhite.active = false;
@@ -492,7 +523,12 @@ export class ShopTrigger extends Component {
     let money = moneyNode.getComponent(Moeny);
     money.moveToPos(true, Vec3.ZERO, 0.3, new Vec3(0, 3, 0), () => {
       // this.open();
-      moneyNode.destroy();
+      if (GamePool.inst) {
+        moneyNode.removeFromParent();
+        GamePool.inst.poolPut("Money", moneyNode);
+      } else {
+        moneyNode.destroy();
+      }
     });
     if (GameGlobal.actor.bag2.children.length > 0) this.onShowMoneyAtAni(true);
 
@@ -540,16 +576,23 @@ export class ShopTrigger extends Component {
         this.node.active = false;
       });
       GameGlobal.buyHummerNum = 2;
-      // GameGlobal.YDHummerOpen = true;
+      GameGlobal.YDHummerOpen = true;
+      GameGlobal.YDHummerOpenCamera = true;
       let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerPos");
       GameGlobal.CameraControl.cameraMove2(muNode, () => {
         GameGlobal.curIceNumStage += 2;
         GameGlobal.iceBoxList.openAllHummer();
-        let buyCarNode: Node = GameGlobal.ditieList.getChildByName("buyCar");
-        let src = buyCarNode.getComponent(ShopTrigger);
         this.scheduleOnce(() => {
-          src.onNodeOpen();
+          GameGlobal.CameraControl.cameraMoveToActor(0.7, () => {
+            AudioManager.soundPlay("dtShow");
+            let buyCarNode: Node = GameGlobal.ditieList.getChildByName("buyCar");
+            buyCarNode.active = true;
+          });
         }, 0.8);
+
+        if (GameGlobal.yindao.curYDId == 4) {
+          GameGlobal.yindao.curYDId++;
+        }
         // if (GameGlobal.buyHummerNum == 1) {
         //   let buyCarNode: Node = GameGlobal.ditieList.getChildByName("buyCar");
         //   let src = buyCarNode.getComponent(ShopTrigger);
@@ -573,6 +616,9 @@ export class ShopTrigger extends Component {
         let src = buyPoolNode.getComponent(ShopTrigger);
         src.onNodeOpen();
       });
+      if (GameGlobal.yindao.curYDId == 6) {
+        GameGlobal.yindao.curYDId++;
+      }
       // GameGlobal.cameraMoving = true;
       // GameGlobal.CameraControl.cameraMove2(
       //   GameGlobal.actor.NpcTakePos,
@@ -600,6 +646,8 @@ export class ShopTrigger extends Component {
         this.node.active = false;
       });
       GameGlobal.poolAni = true;
+      GameGlobal.YDPoolOpen = true;
+      GameGlobal.YDCarThrowState = 0;
       GameGlobal.CameraControl.clearCameraMove();
       GameGlobal.watarRoom.onPoolOpen();
       let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("waterPool1");
@@ -615,6 +663,14 @@ export class ShopTrigger extends Component {
         },
         0.7,
       );
+      GameGlobal.moneyBagMax = 100;
+      GameGlobal.bagoffset.bagMax = 100;
+      GameGlobal.bagoffset.baseDelayFactor = 0.1;
+      GameGlobal.actor.onPlayBagLvUp();
+
+      if (GameGlobal.yindao.curYDId == 9) {
+        GameGlobal.yindao.curYDId++;
+      }
     } else if (this.node.name == "buyNpc") {
       this.playClose(() => {
         this.node.active = false;
@@ -635,6 +691,9 @@ export class ShopTrigger extends Component {
         },
         0.5,
       );
+      if (GameGlobal.yindao.curYDId == 12) {
+        GameGlobal.yindao.curYDId++;
+      }
     } else if (this.node.name == "buyOver") {
       this.playClose(() => {
         this.node.active = false;

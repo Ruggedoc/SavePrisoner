@@ -1,4 +1,20 @@
-import { _decorator, Component, instantiate, Node, Prefab, tween, v3, Vec3, Collider, Quat, Animation, RigidBody } from "cc";
+import {
+  _decorator,
+  Component,
+  instantiate,
+  Node,
+  Prefab,
+  tween,
+  v3,
+  Vec3,
+  Collider,
+  Quat,
+  Animation,
+  RigidBody,
+  SphereCollider,
+  Tween,
+  sys,
+} from "cc";
 import { GameGlobal } from "../GameGlobal";
 import { IceBox } from "./IceBox";
 import { Utils } from "../Utils";
@@ -6,6 +22,8 @@ import { SaveTrigger } from "./SaveTrigger";
 import { MainGame } from "../MainGame";
 import { Npc } from "../actor/Npc";
 import { AudioManager } from "../AudioManager";
+import { IceBoxBreakAni } from "./IceBoxBreakAni";
+import { GamePool } from "../GamePool";
 const { ccclass, property } = _decorator;
 
 @ccclass("IceBoxList")
@@ -47,6 +65,16 @@ export class IceBoxList extends Component {
   @property(Node)
   public breakAni3: Node; // 碎冰特效3
 
+  @property(Node)
+  public newAniNode1: Node; // 碎冰特效1
+  @property(Node)
+  public newAniNode2: Node; // 碎冰特效2
+
+  footcollTriggerNode: Node;
+  footcollNode: Node;
+  footcollTrigger: SphereCollider;
+  footcoll: SphereCollider;
+
   anim1: Animation;
   anim2: Animation;
   anim3: Animation;
@@ -67,20 +95,33 @@ export class IceBoxList extends Component {
     this.initHummer();
     this.loadIceBoxPos();
     this.initBodyPos();
-    let footcoll = this.saveTrigger.getChildByName("pz").getComponent(Collider);
-    footcoll.on("onTriggerEnter", this.onTrggerStart, this);
-    footcoll.on("onTriggerStay", this.onTrggerStay2, this);
-    footcoll.on("onTriggerExit", this.onTrggerExit, this);
+    this.footcollTriggerNode = this.saveTrigger.getChildByName("pz");
+    this.footcollTrigger = this.footcollTriggerNode.getComponent(SphereCollider);
+    this.footcollTrigger.on("onTriggerEnter", this.onJumpTrggerStart, this);
+    this.footcollTrigger.on("onTriggerStay", this.onTrggerStay, this);
+    this.footcollTrigger.on("onTriggerExit", this.onTrggerExit, this);
 
-    // let footJumpColl = this.saveTrigger.getChildByName("jumpPZ").getComponent(Collider);
+    this.footcollNode = this.saveTrigger.getChildByName("jumpPZ");
+    this.footcoll = this.footcollNode.getComponent(SphereCollider);
+    this.footcoll.isTrigger = true;
     // footJumpColl.on("onTriggerEnter", this.onJumpTrggerStart, this);
+    // footJumpColl.on("onTriggerStay", this.onTrggerStay, this);
+    // footJumpColl.on("onTriggerExit", this.onJumpTrggerExit, this);
+    // footJumpColl.on("onTriggerEnter", this.onJumpTrggerStart, this);
+    // footJumpColl.on("onTriggerStay", this.onJumpTrggerStay, this);
     // footJumpColl.on("onTriggerExit", this.onJumpTrggerExit, this);
 
     this.anim1 = this.iceHummer0Ani.getComponent(Animation);
     this.anim2 = this.iceHummer1Ani.getComponent(Animation);
     this.anim3 = this.iceHummer2Ani.getComponent(Animation);
-
-    this.onStartMove();
+    let time = 0.15;
+    if (sys.localStorage.getItem("isReLoad") == null) {
+      sys.localStorage.setItem("isReLoad", "1");
+      time = 1;
+    }
+    this.scheduleOnce(() => {
+      this.onStartMove();
+    }, time);
   }
 
   private initHummer() {
@@ -91,24 +132,6 @@ export class IceBoxList extends Component {
 
   /**解锁多个锤子 */
   public openAllHummer() {
-    // if (GameGlobal.buyHummerNum == 1) {
-    //   this.iceHummer1.active = true;
-    //   this.iceHummer1.getChildByName("loader").scale = Vec3.ZERO;
-    //   tween(this.iceHummer1.getChildByName("loader"))
-    //     .to(0.15, { scale: v3(1.2, 1.2, 1.2) })
-    //     .to(0.1, { scale: v3(0.9, 0.9, 0.9) })
-    //     .to(0.05, { scale: v3(1, 1, 1) })
-    //     .start();
-    // } else if (GameGlobal.buyHummerNum == 2) {
-    //   this.iceHummer2.active = true;
-    //   this.iceHummer2.getChildByName("loader").scale = Vec3.ZERO;
-    //   tween(this.iceHummer2.getChildByName("loader"))
-    //     .to(0.15, { scale: v3(1.2, 1.2, 1.2) })
-    //     .to(0.1, { scale: v3(0.9, 0.9, 0.9) })
-    //     .to(0.05, { scale: v3(1, 1, 1) })
-    //     .start();
-    // }
-
     this.iceHummer1.active = true;
     this.iceHummer1.getChildByName("loader").scale = Vec3.ZERO;
     tween(this.iceHummer1.getChildByName("loader"))
@@ -130,41 +153,36 @@ export class IceBoxList extends Component {
 
   initBodyPos() {
     GameGlobal.bodyPosArr = [
-      new Vec3(-1.8, 0.15, -0.6),
-      new Vec3(-1.3, 0.2, -0.5),
-      new Vec3(-1.3, 0.3, -0.5),
-      new Vec3(0.3, 0.25, -0.6),
-      new Vec3(-0.5, 0.35, 0),
-      new Vec3(0.8, 0.15, -0.1),
-      new Vec3(0.8, 0.22, 0),
-      new Vec3(1.1, 0.4, -0.3),
-      new Vec3(-1.8, 0.5, -1),
-      new Vec3(1, 0.55, 0.02),
-      new Vec3(-0.5, 0.45, -0.35),
-      new Vec3(0.3, 0.3, 0),
-      new Vec3(1, 0.2, -0.6),
-      new Vec3(0.3, 0.25, -0.3),
-      new Vec3(0.8, 0.45, -0.48),
-      new Vec3(0.9, 0.5, -0.4),
-      new Vec3(0.7, 0.3, -0.2),
-      new Vec3(0.6, 0.35, -0.55),
-      new Vec3(0.5, 0.55, 0.11),
-      new Vec3(-0.5, 0.6, -0.5),
-      new Vec3(0.9, 0.24, -0.6),
-      new Vec3(-1.8, 0.32, -0.32),
-      new Vec3(-1.3, 0.22, -0.6),
-      new Vec3(0.85, 0.38, -0.6),
+      new Vec3(-1.8, 0.15, -0.7),
+      new Vec3(-1.3, 0.2, -0.6),
+      new Vec3(-1.3, 0.3, -0.6),
+      new Vec3(0.3, 0.25, -0.7),
+      new Vec3(-0.5, 0.35, -0.1),
+      new Vec3(0.8, 0.15, -0.2),
+      new Vec3(0.8, 0.22, -0.1),
+      new Vec3(1.1, 0.4, -0.4),
+      new Vec3(-1.8, 0.5, -1.1),
+      new Vec3(1, 0.55, -0.08),
+      new Vec3(-0.5, 0.45, -0.45),
+      new Vec3(0.3, 0.3, -0.1),
+      new Vec3(1, 0.2, -0.7),
+      new Vec3(0.3, 0.25, -0.4),
+      new Vec3(0.8, 0.45, -0.58),
+      new Vec3(0.9, 0.5, -0.5),
+      new Vec3(0.7, 0.3, -0.3),
+      new Vec3(0.6, 0.35, -0.65),
+      new Vec3(0.5, 0.55, 0.01),
+      new Vec3(-0.5, 0.6, -0.6),
+      new Vec3(0.9, 0.24, -0.7),
+      new Vec3(-1.8, 0.32, -0.42),
+      new Vec3(-1.3, 0.22, -0.7),
+      new Vec3(0.85, 0.38, -0.7),
     ];
 
     this.fromPosArr = [new Vec3(-1.2, 0.8, -7), new Vec3(0.23, 0.8, -7), new Vec3(1.3, 0.8, -7)];
   }
 
   public loadIceBoxPos() {
-    // for (let index = 0; index < this.bodyList.children.length; index++) {
-    //   let boxNode = this.boxList.getChildByName("iceBox" + index);
-    //   this.icePosArr.push(boxNode.position.clone());
-    //   this.iceBoxArr.push(boxNode);
-    // }
     for (let index = 0; index < 9; index++) {
       let boxNode = this.boxList.getChildByName("iceBox" + index);
       if (boxNode != null) {
@@ -172,33 +190,78 @@ export class IceBoxList extends Component {
       }
       this.icePosArr.push(new Vec3(0, 0, -6.5 * index));
     }
-    // this.fromPos = new Vec3(0, 0, -1.5);
+  }
+
+  onChangeTrrigerArae() {
+    if (GameGlobal.actor.getIsTakeNpc2() || GameGlobal.actor.getCarShowState()) {
+      this.footcollTrigger.radius = 0.5;
+    } else {
+      this.footcollTrigger.radius = 1;
+    }
+  }
+
+  onRefreshFootCollider() {
+    if (GameGlobal.actor.getCarShowState()) {
+      this.footcollTriggerNode.active = true;
+      // this.footcollNode.active = false;
+      this.footcoll.isTrigger = true;
+      // this.footcollTrigger.enabled = true;
+      // this.footcoll.enabled = false;
+    } else {
+      this.footcollTriggerNode.active = !GameGlobal.actor.getIsTakeNpc2() && GameGlobal.bIceReady;
+      // this.footcollNode.active = !this.footcollTriggerNode.active;
+      this.footcoll.isTrigger = this.footcollTriggerNode.active;
+
+      // this.footcoll.enabled = !GameGlobal.bIceReady || GameGlobal.actor.getIsTakeNpc2();
+      // this.footcollTrigger.enabled = !this.footcoll.enabled;
+    }
   }
 
   onJumpTrggerStart(event) {
+    if (GameGlobal.actor.isJump) return;
+    if (!GameGlobal.bIceReady) {
+      this.onButtonAni();
+      return;
+    }
     if (GameGlobal.actor.getCarShowState()) return;
     let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
     if (body.getGroup() == 1) {
-      GameGlobal.actor.onJumpButton();
+      // GameGlobal.actor.onJumpButton();
+      if (GameGlobal.actor.getIsTakeNpc2()) {
+        this.onButtonAni();
+        // this.onTrggerStay();
+      } else {
+        GameGlobal.actor.onJumpToButton();
+      }
     }
     // AudioManager.soundPlay("footTag");
   }
-  onJumpTrggerExit(event) {
-    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
-    if (body.getGroup() == 1) {
-      GameGlobal.actor.setSetPlayerY();
-    }
-    // AudioManager.soundPlay("footTag");
-  }
+  // onJumpTrggerStay(event) {
+  //   if (GameGlobal.actor.isJump) return;
+  //   if (!GameGlobal.bIceReady) return;
+  //   if (GameGlobal.actor.getCarShowState()) return;
+  //   let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+  //   if (body.getGroup() == 1) {
+  //     // this.onTrggerStay();
+  //   }
+  //   // AudioManager.soundPlay("footTag");
+  // }
+  // onJumpTrggerExit(event) {
+  //   let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+  //   if (body.getGroup() == 1) {
+  //     // GameGlobal.actor.setSetPlayerY();
+  //   }
+  //   // AudioManager.soundPlay("footTag");
+  // }
 
   onTrggerStart() {
-    if (!GameGlobal.actor.getCarShowState()) {
-      if (!this.isTriggerOpen) return;
-    }
-    if (GameGlobal.actor.isHummerIce) return;
-    // this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(true);
-    // AudioManager.soundPlay("footTag");
-    this.onButtonAni();
+    this.scheduleOnce(() => {
+      if (!GameGlobal.actor.getCarShowState()) {
+        if (!this.isTriggerOpen) return;
+      }
+      if (GameGlobal.actor.isHummerIce) return;
+      this.onButtonAni();
+    });
   }
 
   public onButtonAni() {
@@ -209,68 +272,86 @@ export class IceBoxList extends Component {
   //   this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(true);
   //   AudioManager.soundPlay("footTag");
   // }
-  onTrggerExit(event) {
-    if (!GameGlobal.actor.getCarShowState()) {
-      if (!this.isTriggerOpen) return;
-    }
-    this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(false);
-    let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
-    if (body.getGroup() == 1) {
-      GameGlobal.actor.setSetPlayerY();
-    }
-  }
-  // onTrggerExit() {
+  // onTrggerExit(event) {
+  //   if (!GameGlobal.actor.getCarShowState()) {
+  //     if (!this.isTriggerOpen) return;
+  //   }
   //   this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(false);
-  //   // let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
-  //   // if (body.getGroup() == 1) {
-  //   GameGlobal.actor.setSetPlayerY();
-  //   // }
+  //   let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+  //   if (body.getGroup() == 1) {
+  //     GameGlobal.actor.setSetPlayerY();
+  //   }
   // }
-  public onTrggerStay2(event) {
-    const body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
-    if (body.getGroup() == 1) {
-      if (!GameGlobal.actor.getCarShowState()) {
-        if (!this.isTriggerOpen) return;
-      }
-    }
-    if (GameGlobal.isOver) return;
-    if (GameGlobal.actor.isJump) return;
-    if (!GameGlobal.bIceReady) return;
-    GameGlobal.bIceReady = false;
-    this.onPlayHummerAni();
+  onTrggerExit() {
+    this.saveTrigger.getComponent(SaveTrigger).onPlayerFootAni(false);
+    // let body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+    // if (body.getGroup() == 1) {
+    GameGlobal.actor.setSetPlayerY();
+    // }
+    this.onRefreshFootCollider();
   }
-
-  // public onTrggerStay() {
-  //   if (this.isFristAni) return;
+  // public onTrggerStay2(event) {
+  //   const body: RigidBody = event.otherCollider.node.getComponent(RigidBody);
+  //   if (body.getGroup() == 1) {
+  //     if (!GameGlobal.actor.getCarShowState()) {
+  //       if (!this.isTriggerOpen) return;
+  //     }
+  //   }
   //   if (GameGlobal.isOver) return;
   //   if (GameGlobal.actor.isJump) return;
   //   if (!GameGlobal.bIceReady) return;
   //   GameGlobal.bIceReady = false;
-
-  //   if (this.isFristYD) {
-  //     this.isFristYD = false;
-  //     GameGlobal.actor.isWalkStop = true;
-  //     GameGlobal.actor.stopMove();
-  //     GameGlobal.actor.onIdle();
-  //     this.onPlayHummerAni();
-  //     let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerPosStart");
-  //     GameGlobal.CameraControl.cameraMove2(
-  //       muNode,
-  //       () => {
-  //         this.scheduleOnce(() => {
-  //           GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
-  //             GameGlobal.isFirstStepon = false;
-  //             GameGlobal.actor.isWalkStop = false;
-  //           });
-  //         }, 1);
-  //       },
-  //       0.5,
-  //     );
-  //   }
-
-  //   if (GameGlobal.isFirstStepon) return;
-
   //   this.onPlayHummerAni();
+  // }
+
+  public onTrggerStay() {
+    if (this.isFristAni) return;
+    if (GameGlobal.isOver) return;
+    if (GameGlobal.actor.isJump) return;
+    if (!GameGlobal.bIceReady) return;
+    if (GameGlobal.actor.getIsTakeNpc2()) return;
+    GameGlobal.bIceReady = false;
+
+    if (GameGlobal.actor.isFirstJump) {
+      this.scheduleOnce(() => {
+        this.onPlayHummerAni();
+      }, 0.5);
+    } else if (GameGlobal.YDHummerOpenCamera) {
+      this.scheduleOnce(() => {
+        this.onPlayHummerAni();
+      }, 0.8);
+    } else {
+      this.onPlayHummerAni();
+    }
+    if (GameGlobal.yindao.curYDId == 5) {
+      if (GameGlobal.actor.getCarShowState()) {
+        GameGlobal.yindao.curYDId = 7;
+      }
+    }
+  }
+
+  //#region 第一次跳跃动画
+  // public onFistJumpAni() {
+  // if (this.isFristYD) {
+  // this.isFristYD = false;
+  // GameGlobal.actor.isWalkStop = true;
+  // GameGlobal.actor.stopMove();
+  // GameGlobal.actor.onIdle();
+  // this.onPlayHummerAni();
+  // let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerPosStart");
+  // GameGlobal.CameraControl.cameraMove2(
+  //   muNode,
+  //   () => {
+  //     this.scheduleOnce(() => {
+  //       GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
+  //         GameGlobal.isFirstStepon = false;
+  //         GameGlobal.actor.isWalkStop = false;
+  //       });
+  //     }, 1);
+  //   },
+  //   0.5,
+  // );
+  // }
   // }
 
   onPlayBreak() {
@@ -301,7 +382,9 @@ export class IceBoxList extends Component {
     }, 1.2);
   }
 
-  update(deltaTime: number) {}
+  update(deltaTime: number) {
+    this.onChangeTrrigerArae();
+  }
 
   //#region 锤完飞尸体
   public playBreak() {
@@ -314,18 +397,21 @@ export class IceBoxList extends Component {
       }
     }
     if (GameGlobal.curIceNumStage == 1) {
+      this.newAniNode1.getComponent(IceBoxBreakAni).onPlayAni2();
       this.breakAni1.active = true;
       this.scheduleOnce(() => {
         this.breakAni1.active = false;
       }, 2);
     } else {
+      this.newAniNode1.getComponent(IceBoxBreakAni).onPlayAni2();
+      this.newAniNode2.getComponent(IceBoxBreakAni).onPlayAni2();
       this.breakAni1.active = true;
       this.breakAni2.active = true;
-      this.breakAni3.active = true;
+      // this.breakAni3.active = true;
       this.scheduleOnce(() => {
         this.breakAni1.active = false;
         this.breakAni2.active = false;
-        this.breakAni3.active = false;
+        // this.breakAni3.active = false;
       }, 2);
     }
   }
@@ -367,20 +453,27 @@ export class IceBoxList extends Component {
       return;
     }
     this.npcCount++;
-    let temp = instantiate(this.bodyPfb);
-    temp.setParent(this.bodyList);
+    let npcNode = GamePool.inst.poolGet("Npc");
+    npcNode.getComponent(Npc).initData();
+    npcNode.setParent(this.bodyList);
     let pos2 = this.getNextNpcPos();
-
-    temp.setPosition(this.getNpcInitPos());
-    temp.setRotationFromEuler(0, 0, 0);
-    temp.setRotationFromEuler(90, Utils.randomRange(-45, 45), Utils.randomRange(0, 180));
-    this.moveToPos(temp, pos2, 0.35, () => {
-      temp.getComponent(Npc).isready = true;
+    npcNode.setPosition(this.getNpcInitPos());
+    npcNode.setRotationFromEuler(0, 0, 0);
+    npcNode.setRotationFromEuler(90, Utils.randomRange(-45, 45), Utils.randomRange(0, 180));
+    this.moveToPos(npcNode, pos2, 0.35, () => {
+      npcNode.getComponent(Npc).isready = true;
       if (this.bodyList.children.length >= GameGlobal.saveMaxNum) {
-        temp.destroy();
+        if (GamePool.inst) {
+          Tween.stopAllByTarget(npcNode);
+          npcNode.removeFromParent();
+          GamePool.inst.poolPut("Npc", npcNode);
+        } else {
+          npcNode.destroy();
+        }
       }
     });
 
+    // GameGlobal.npcBarList.onAddBar(npcNode);
     this.scheduleOnce(() => {
       this.addNpc();
     }, 0.01);
@@ -397,20 +490,29 @@ export class IceBoxList extends Component {
       return;
     }
     this.npcCount++;
-    let temp = instantiate(this.bodyPfb);
-    temp.setParent(this.bodyList);
+    let npcNode = GamePool.inst.poolGet("Npc");
+    npcNode.getComponent(Npc).initData();
+    npcNode.setParent(this.bodyList);
     let pos2 = this.getNextNpcPos();
 
-    temp.setPosition(this.getNpcInitPos());
-    temp.setRotationFromEuler(0, 0, 0);
-    temp.setRotationFromEuler(90, Utils.randomRange(-45, 45), Utils.randomRange(0, 180));
-    this.moveToPos(temp, pos2, 0.25, () => {
-      temp.getComponent(Npc).isready = true;
+    npcNode.setPosition(this.getNpcInitPos());
+    npcNode.setRotationFromEuler(0, 0, 0);
+    npcNode.setRotationFromEuler(90, Utils.randomRange(-45, 45), Utils.randomRange(0, 180));
+    this.moveToPos(npcNode, pos2, 0.25, () => {
+      npcNode.getComponent(Npc).isready = true;
       if (this.bodyList.children.length >= GameGlobal.saveMaxNum) {
-        temp.destroy();
+        if (GamePool.inst) {
+          Tween.stopAllByTarget(npcNode);
+          npcNode.removeFromParent();
+          GamePool.inst.poolPut("Npc", npcNode);
+        } else {
+          npcNode.removeFromParent();
+          npcNode.destroy();
+        }
       }
     });
 
+    // GameGlobal.npcBarList.onAddBar(npcNode);
     this.scheduleOnce(() => {
       this.addNpc2();
     }, 0.01);
@@ -472,10 +574,11 @@ export class IceBoxList extends Component {
       let iceBox = this.iceBoxArr[index];
       let iceBoxSrc = iceBox.getComponent(IceBox);
       iceBoxSrc.doMove(this.icePosArr[index], 1.5, () => {});
-      this.scheduleOnce(() => {
-        GameGlobal.bIceReady = true;
-      }, 1.6);
     }
+    this.scheduleOnce(() => {
+      GameGlobal.bIceReady = true;
+      this.onRefreshFootCollider();
+    }, 1.6);
   }
 
   //#region 创建并移动冰块 三个
@@ -506,6 +609,7 @@ export class IceBoxList extends Component {
     this.scheduleOnce(
       () => {
         GameGlobal.bIceReady = true;
+        this.onRefreshFootCollider();
       },
       1.5 * GameGlobal.curIceNumStage + 0.1,
     );

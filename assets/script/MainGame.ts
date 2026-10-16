@@ -16,6 +16,8 @@ import {
   UIOpacity,
   Collider,
   Widget,
+  PhysicsSystem,
+  EPhysicsDrawFlags,
 } from "cc";
 import { GameGlobal } from "./GameGlobal";
 import { AudioManager } from "./AudioManager";
@@ -105,8 +107,11 @@ export class MainGame extends Component {
     PlayableSDK.onInteracted();
 
     if (window.setLoadingProgress) {
-      window.setLoadingProgress(100);
+      this.scheduleOnce(() => {
+        window.setLoadingProgress(100);
+      }, 1);
     }
+
     // if(!this.YDcamerab){
     //     this.scheduleOnce(() => {
     //         this.mainNode.getChildByName("builds").getChildByName("jiagong").getChildByName("Canvas").getChildByName("Sprite").active = true;
@@ -335,7 +340,6 @@ export class MainGame extends Component {
   }
 
   //#region 检查有没有浴巾囚犯
-  
 
   getNpcByType() {
     let npcArr = this.SprListNode.getChildByName("npcList").children;

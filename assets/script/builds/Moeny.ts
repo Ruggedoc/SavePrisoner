@@ -26,6 +26,13 @@ export class Moeny extends Component {
   public isConterEnter: boolean = false;
   public isConterLeave: boolean = false;
 
+  initData() {
+    this.isready = true;
+    this.isMoveb = false;
+    this.callback = null;
+    this.isMoving = false;
+    this.node.setWorldScale(Vec3.ONE);
+  }
   //#region 飞  适合起始点和目标点固定不变的情况
   //普通飞
   moveToPos(
