@@ -310,9 +310,27 @@ export class IceBoxList extends Component {
         this.onPlayHummerAni();
       }, 0.5);
     } else if (GameGlobal.YDHummerOpenCamera) {
-      this.scheduleOnce(() => {
-        this.onPlayHummerAni();
-      }, 0.8);
+      if (GameGlobal.actor.getCarShowState()) {
+        if (GameGlobal.actor.isHummerIce) return;
+        GameGlobal.mainGame.stopjoy();
+        GameGlobal.actor.isHummerIce = true;
+        let hummerPos2 = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPos");
+        GameGlobal.CameraControl.cameraMove5(hummerPos2, 0.8, () => {
+          this.scheduleOnce(() => {
+            GameGlobal.CameraControl.cameraMove6(0.65, () => {
+              GameGlobal.actor.isHummerIce = false;
+              GameGlobal.YDHummerOpenCamera = false;
+            });
+          }, 1.2);
+        });
+        this.scheduleOnce(() => {
+          this.onPlayHummerAni();
+        }, 1);
+      } else {
+        this.scheduleOnce(() => {
+          this.onPlayHummerAni();
+        }, 0.8);
+      }
     } else {
       this.onPlayHummerAni();
     }

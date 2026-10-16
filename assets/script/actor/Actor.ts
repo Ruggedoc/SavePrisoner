@@ -311,7 +311,7 @@ export class Actor extends Component {
     }
     if (GameGlobal.YDHummerOpenCamera) {
       let hummerPos2 = GameGlobal.mainGame.GamePosNode.getChildByName("hummerPos");
-      GameGlobal.CameraControl.cameraMove5(hummerPos2, 0.7);
+      GameGlobal.CameraControl.cameraMove5(hummerPos2, 0.8);
     }
     this.isJump = false;
     GameGlobal.iceBoxList.isTriggerOpen = false;
@@ -370,7 +370,7 @@ export class Actor extends Component {
           this.isHummerIce = false;
           GameGlobal.YDHummerOpenCamera = false;
         });
-      }, 2.2);
+      }, 2.1);
     } else {
       this.scheduleOnce(() => {
         GameGlobal.CameraControl.cameraShock(false);

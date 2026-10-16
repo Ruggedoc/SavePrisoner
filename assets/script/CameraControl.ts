@@ -203,7 +203,7 @@ export class CameraControl extends Component {
     let targetPos = targetNode.worldPosition.clone();
     let targetPos2 = new Vec3(0, 0, 0);
     Vec3.add(targetPos2, targetPos, this.offsetPos);
-    let targetFov = this.gameInitFov + 5;
+    let targetFov = this.gameInitFov + 15;
 
     tween(GameGlobal.mainCamera).to(toTime, { fov: targetFov }).start();
 

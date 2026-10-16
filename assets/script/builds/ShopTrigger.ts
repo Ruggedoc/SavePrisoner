@@ -584,31 +584,21 @@ export class ShopTrigger extends Component {
       GameGlobal.bagoffset.baseDelayFactor = 0.1;
       GameGlobal.actor.onPlayBagLvUp();
       let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerPos");
-      GameGlobal.CameraControl.cameraMove2(muNode, () => {
+      // GameGlobal.CameraControl.cameraMove2(muNode, () => {
+      GameGlobal.CameraControl.cameraMove5(muNode, 0.7, () => {
         GameGlobal.curIceNumStage += 2;
         GameGlobal.iceBoxList.openAllHummer();
         this.scheduleOnce(() => {
-          GameGlobal.CameraControl.cameraMoveToActor(0.7, () => {
+          GameGlobal.CameraControl.cameraMove6(0.7, () => {
             AudioManager.soundPlay("dtShow");
             let buyCarNode: Node = GameGlobal.ditieList.getChildByName("buyCar");
             buyCarNode.active = true;
           });
-        }, 0.8);
+        }, 1);
 
         if (GameGlobal.yindao.curYDId == 4) {
           GameGlobal.yindao.curYDId++;
         }
-        // if (GameGlobal.buyHummerNum == 1) {
-        //   let buyCarNode: Node = GameGlobal.ditieList.getChildByName("buyCar");
-        //   let src = buyCarNode.getComponent(ShopTrigger);
-        //   this.scheduleOnce(() => {
-        //     src.onNodeOpen();
-        //   }, 0.8);
-        // } else {
-        // this.scheduleOnce(() => {
-        //   GameGlobal.CameraControl.cameraMoveToActor();
-        // }, 1);
-        // }
       });
     } else if (this.node.name == "buyCar") {
       this.playClose(() => {
