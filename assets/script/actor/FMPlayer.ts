@@ -99,9 +99,9 @@ export class FMPlayer extends Component {
     GameGlobal.FMPlayer.isYDNpcMove = true; //开启摄像机引导
     GameGlobal.bPlayerOpen = true;
     GameGlobal.cameraMoving = true;
-    this.scheduleOnce(()=>{
+    this.scheduleOnce(() => {
       this.showEfc.active = true;
-    },0.3);
+    }, 0.3);
   }
 
   update(dt: number) {
@@ -328,7 +328,7 @@ export class FMPlayer extends Component {
         targetRos,
         () => {
           this.scheduleOnce(() => {
-            bodySrc.onPlayDefrostAni(bodyNode, () => {});
+            bodySrc.onPlayDefrostAni(bodyNode, false, () => {});
           }, 0.2);
         },
         new Vec3(0, 2.5, 0),

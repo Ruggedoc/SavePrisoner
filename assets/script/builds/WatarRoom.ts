@@ -377,7 +377,7 @@ export class WatarRoom extends Component {
       targetRot,
       () => {
         this.scheduleOnce(() => {
-          bodySrc.onPlayDefrostAni(bodyNode, () => {});
+          bodySrc.onPlayDefrostAni(bodyNode, true, () => {});
         }, 0.2);
       },
       new Vec3(0, 2.5, 0),

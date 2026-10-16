@@ -123,7 +123,7 @@ export class EquipConter extends Component {
           nodeSrc.isMoveb = false;
           nodeSrc.isConterLeave = false;
           n.setWorldPosition(tempPos);
-          if (GameGlobal.actor.bag2.children.length >= GameGlobal.moneyConterMax) {
+          if (GameGlobal.actor.bag2.children.length >= GameGlobal.moneyBagMax) {
             n.removeFromParent();
             GamePool.inst.poolPut("Money", n);
           } else {

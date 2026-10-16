@@ -845,7 +845,7 @@ export class Npc extends Component {
   /**
    * 播放人物在水池解锁的动画和进度条
    */
-  onPlayDefrostAni(n: Node, func?) {
+  onPlayDefrostAni(n: Node, isUser = true, func?) {
     this.saveEfc.active = true;
     this.BGback.active = true;
     this.smileNode.active = true;
@@ -862,7 +862,7 @@ export class Npc extends Component {
     });
 
     if (GameGlobal.actor.isWarterAduioMap) {
-      AudioManager.soundPlay("npcSign");
+      if (isUser) AudioManager.soundPlay("npcSign");
     }
     if (GameGlobal.throwingBodyTime == 1) {
       if (!GameGlobal.throwingTimeAddTag) {
