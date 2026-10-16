@@ -1,7 +1,7 @@
 import { AudioManager } from "../AudioManager";
 import { Moeny } from "../builds/Moeny";
 import { ShopTrigger } from "../builds/ShopTrigger";
-import { NpcAniState, State_User } from "../EnumDefine";
+import { NpcAniState, State_User, YDCheckType } from "../EnumDefine";
 import { GameGlobal } from "../GameGlobal";
 import { MainGame } from "../MainGame";
 import { Utils } from "../Utils";
@@ -336,15 +336,7 @@ export class Actor extends Component {
     }, 0.3);
 
     this.scheduleOnce(() => {
-      if (GameGlobal.yindao.curYDId == 0) {
-        GameGlobal.yindao.curYDId = 1;
-      } else if (GameGlobal.yindao.curYDId == 5) {
-        if (GameGlobal.bOpenCar) {
-          GameGlobal.yindao.curYDId = 7;
-        } else {
-          GameGlobal.yindao.curYDId = 6;
-        }
-      }
+      GameGlobal.yindao.YDRefresh(YDCheckType.YDNpcButton);
     }, 1);
 
     if (this.isFirstJump) {
@@ -674,21 +666,23 @@ export class Actor extends Component {
       GameGlobal.actor.onChangeCarState(true);
       GameGlobal.iceBoxList.onRefreshFootCollider();
       this.onTakeBodyMuch(body);
-      if (GameGlobal.YDCarOpen) {
-        GameGlobal.YDCarThrowState = 1;
-      }
-      if (GameGlobal.YDPoolOpen) {
-        GameGlobal.YDCarThrowState = 1;
-      }
-      if (GameGlobal.yindao.curYDId == 7) {
-        GameGlobal.yindao.curYDId = 8;
-      }
+      // if (GameGlobal.YDCarOpen) {
+      //   GameGlobal.YDCarThrowState = 1;
+      // }
+      // if (GameGlobal.YDPoolOpen) {
+      //   GameGlobal.YDCarThrowState = 1;
+      // }
+      // if (GameGlobal.yindao.curYDId == 7) {
+      //   GameGlobal.yindao.curYDId = 8;
+      // }
     } else {
       this.onTakeBodySingle(body);
-      if (GameGlobal.yindao.curYDId == 1) {
-        GameGlobal.yindao.curYDId++;
-      }
+      // if (GameGlobal.yindao.curYDId == 1) {
+      //   GameGlobal.yindao.curYDId++;
+      // }
     }
+    GameGlobal.yindao.YDRefresh(YDCheckType.YDTakeNpc);
+
     AudioManager.soundPlay("takeIceNpc");
   }
 
@@ -819,6 +813,7 @@ export class Actor extends Component {
     }
     if (this.onGetBag2ReallyCount() >= GameGlobal.moneyBagMax) {
       //屏幕显示满的提示
+      
       this.onPlayBagMax();
       return;
     }
@@ -866,9 +861,7 @@ export class Actor extends Component {
       //拿完了或者背包满了
       let isOpen = GameGlobal.equipConter.goldPos.children.length <= 0 && GameGlobal.actor.bag2.children.length > 0;
       if (isOpen || GameGlobal.actor.bag2.children.length >= GameGlobal.moneyBagMax) {
-        if (GameGlobal.yindao.curYDId == 3) {
-          GameGlobal.yindao.curYDId++;
-        }
+        GameGlobal.yindao.YDRefresh(YDCheckType.YDMoney);
         GameGlobal.mainGame.stopjoy();
         GameGlobal.ditieList.getChildByName("buyHummer").getComponent(ShopTrigger).onNodeOpen();
         GameGlobal.isFirstGetGold = false;
@@ -1119,6 +1112,11 @@ export class Actor extends Component {
   //#region 获取玩家小车满没满
   getIsTakeNpc3() {
     return this.NpcTakePos.children.length >= GameGlobal.takeBodyMax2;
+  }
+
+  //#region 获取玩家小车Npc数量
+  getIsTakeNpc5() {
+    return this.NpcTakePos.children.length;
   }
 
   //#region 获取玩家正在抱的NPC节点

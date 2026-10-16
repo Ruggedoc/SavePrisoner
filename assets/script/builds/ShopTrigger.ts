@@ -18,6 +18,7 @@ import { AudioManager } from "../AudioManager";
 import { MainGame } from "../MainGame";
 import { Moeny } from "./Moeny";
 import { GamePool } from "../GamePool";
+import { YDCheckType } from "../EnumDefine";
 const { ccclass, property } = _decorator;
 
 @ccclass("ShopTrigger")
@@ -105,6 +106,8 @@ export class ShopTrigger extends Component {
   moneySoundCount: number = 0;
 
   greenMeshRenderer: MeshRenderer = null;
+
+  public initFinish: boolean = false;
 
   start() {
     this.collider = this.colliderNode.getComponent(BoxCollider);
@@ -278,6 +281,7 @@ export class ShopTrigger extends Component {
     this.isMoveToDiTie = false;
 
     this.updateCoinNum1(0);
+    this.initFinish = true;
   }
 
   initLv() {
@@ -289,13 +293,30 @@ export class ShopTrigger extends Component {
   public onNodeOpen() {
     if (this.node.name == "buyHummer") {
       let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("hummerOpenPos");
-      GameGlobal.CameraControl.cameraMoveToPosPingPong(muNode, () => {
-        AudioManager.soundPlay("dtShow");
-        this.node.active = true;
-        this.init();
-        this.onEnable();
-      });
-      GameGlobal.nextBuyDitie = this.node;
+      // GameGlobal.CameraControl.cameraMoveToPosPingPong(muNode, () => {
+      //   AudioManager.soundPlay("dtShow");
+      //   this.node.active = true;
+      //   this.init();
+      //   this.onEnable();
+      // });
+      GameGlobal.CameraControl.cameraMove2(
+        muNode,
+        () => {
+          AudioManager.soundPlay("dtShow");
+          this.node.active = true;
+          this.init();
+          GameGlobal.yindao.curBuyDTStage = 0;
+          this.onEnable();
+          this.scheduleOnce(() => {
+            GameGlobal.CameraControl.cameraMoveToActor(0.7, () => {
+              GameGlobal.yindao.isFirstDitieShow = true;
+              GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
+            });
+          }, 1);
+        },
+        0.7,
+      );
+      // GameGlobal.nextBuyDitie = this.node;
       // GameGlobal.nextBuyPrice = GameGlobal.buyIceNumMoney;
     } else if (this.node.name == "buyCar") {
       // GameGlobal.CameraControl.cameraMoveToActor(0.5);
@@ -311,6 +332,10 @@ export class ShopTrigger extends Component {
       //   },
       //   0.7,
       // );
+      AudioManager.soundPlay("dtShow");
+      this.node.active = true;
+      this.init();
+      GameGlobal.yindao.curBuyDTStage = 1;
       GameGlobal.nextBuyDitie = this.node;
       // GameGlobal.nextBuyPrice = GameGlobal.buyCarMoney;
     } else if (this.node.name == "buyBigPool") {
@@ -318,6 +343,7 @@ export class ShopTrigger extends Component {
         this.node.active = true;
         AudioManager.soundPlay("dtShow");
         this.init();
+        GameGlobal.yindao.curBuyDTStage = 2;
       } else {
         this.init();
         let muNode = MainGame.mymain.mainNode.getChildByName("GamePos").getChildByName("waterPool2");
@@ -327,11 +353,11 @@ export class ShopTrigger extends Component {
           () => {
             this.node.active = true;
             this.init();
+            GameGlobal.yindao.curBuyDTStage = 2;
             this.scheduleOnce(() => {
               GameGlobal.CameraControl.cameraMoveToActor(0.5);
-              if (GameGlobal.yindao.curYDId == 9) {
-                GameGlobal.yindao.curYDId++;
-              }
+              GameGlobal.yindao.isFirstDitieShow = false;
+              GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
             }, 0.8);
           },
           0.7,
@@ -349,13 +375,13 @@ export class ShopTrigger extends Component {
       this.scheduleOnce(() => {
         this.node.active = true;
         this.init();
+        GameGlobal.yindao.curBuyDTStage = 3;
       }, 0.32);
       // this.scheduleOnce(() => {
       GameGlobal.CameraControl.cameraMoveToActor(0.5, () => {
         GameGlobal.poolAni = false;
-        if (GameGlobal.yindao.curYDId == 12) {
-          GameGlobal.yindao.curYDId++;
-        }
+        GameGlobal.yindao.isFirstDitieShow = false;
+        GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
       });
       // }, 0.8);
       //   },
@@ -371,6 +397,7 @@ export class ShopTrigger extends Component {
         () => {
           this.node.active = true;
           this.init();
+          GameGlobal.yindao.curBuyDTStage = 4;
           this.scheduleOnce(() => {
             GameGlobal.CameraControl.cameraMoveToActor(0.5);
           }, 0.8);
@@ -590,15 +617,12 @@ export class ShopTrigger extends Component {
         GameGlobal.iceBoxList.openAllHummer();
         this.scheduleOnce(() => {
           GameGlobal.CameraControl.cameraMove6(0.7, () => {
-            AudioManager.soundPlay("dtShow");
             let buyCarNode: Node = GameGlobal.ditieList.getChildByName("buyCar");
-            buyCarNode.active = true;
+            buyCarNode.getComponent(ShopTrigger).onNodeOpen();
           });
         }, 1);
-
-        if (GameGlobal.yindao.curYDId == 4) {
-          GameGlobal.yindao.curYDId++;
-        }
+        GameGlobal.yindao.isFirstDitieShow = false;
+        GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
       });
     } else if (this.node.name == "buyCar") {
       this.playClose(() => {
@@ -611,9 +635,8 @@ export class ShopTrigger extends Component {
         let src = buyPoolNode.getComponent(ShopTrigger);
         src.onNodeOpen();
       });
-      if (GameGlobal.yindao.curYDId == 6) {
-        GameGlobal.yindao.curYDId++;
-      }
+      GameGlobal.yindao.isFirstDitieShow = false;
+      GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
       // GameGlobal.cameraMoving = true;
       // GameGlobal.CameraControl.cameraMove2(
       //   GameGlobal.actor.NpcTakePos,
@@ -663,9 +686,8 @@ export class ShopTrigger extends Component {
       GameGlobal.bagoffset.baseDelayFactor = 0.05;
       GameGlobal.actor.onPlayBagLvUp();
 
-      if (GameGlobal.yindao.curYDId == 9) {
-        GameGlobal.yindao.curYDId++;
-      }
+      GameGlobal.yindao.isFirstDitieShow = false;
+      GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
     } else if (this.node.name == "buyNpc") {
       this.playClose(() => {
         this.node.active = false;
@@ -686,9 +708,8 @@ export class ShopTrigger extends Component {
         },
         0.5,
       );
-      if (GameGlobal.yindao.curYDId == 12) {
-        GameGlobal.yindao.curYDId++;
-      }
+      GameGlobal.yindao.isFirstDitieShow = false;
+      GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
     } else if (this.node.name == "buyOver") {
       this.playClose(() => {
         this.node.active = false;

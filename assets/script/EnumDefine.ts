@@ -86,13 +86,61 @@ export enum NpcWorkStage {
   toBattle,
   findEnemy,
   battle,
-  die
+  die,
 }
 
 export enum NpcFashion {
   ice,
   towel,
   equip,
+}
+
+export enum YDCheckType {
+  /**踩NPC按钮完成 */
+  YDNpcButton,
+  /**搬NPC完成 */
+  YDTakeNpc,
+  /**去解冻完成 */
+  YDThrow,
+  /**买地贴完成 */
+  YDBuyDiTie,
+  /**柜台取金币完成 */
+  YDEquipCounter,
+  /**战斗地图取金币完成 */
+  YDBattle,
+  /**取金币完成（柜台和战斗地图都可以的情况） */
+  YDMoney,
+}
+
+export enum YDIDType {
+  /**第一步踩锤子按钮 */
+  YDButton,
+  /**第二步捡尸体 */
+  YDTakeNpc2,
+  /**第三步解冻尸体 */
+  YDThrow3,
+  /**第四步到柜台取金币 */
+  YDConterMoney,
+  /**第五步买锤子地贴 */
+  YDBuyHummer,
+  /**第六步踩锤子按钮 */
+  YDButton6,
+  /**第七步买车 */
+  YDBuyCar,
+  /**第八步捡尸体 */
+  YDTakeNpc8,
+  /**第九步解冻尸体 */
+  YDThrow9,
+  /**第十步买水池 */
+  YDBuyWater,
+  /**第十一步捡尸体 */
+  YDTakeNpc11,
+  /**第十二步引导去解冻尸体 */
+  YDThrow12,
+  /**第十三步解锁搬运工 */
+  YDBuyFMPlayer,
+  /**第十四步买扩建地贴 */
+  YDBuyOver,
 }
 
 ccenum(UpSkillType);

@@ -24,6 +24,7 @@ import { Npc } from "../actor/Npc";
 import { AudioManager } from "../AudioManager";
 import { IceBoxBreakAni } from "./IceBoxBreakAni";
 import { GamePool } from "../GamePool";
+import { YDCheckType } from "../EnumDefine";
 const { ccclass, property } = _decorator;
 
 @ccclass("IceBoxList")
@@ -334,11 +335,7 @@ export class IceBoxList extends Component {
     } else {
       this.onPlayHummerAni();
     }
-    if (GameGlobal.yindao.curYDId == 5) {
-      if (GameGlobal.actor.getCarShowState()) {
-        GameGlobal.yindao.curYDId = 7;
-      }
-    }
+    GameGlobal.yindao.YDRefresh(YDCheckType.YDNpcButton);
   }
 
   //#region 第一次跳跃动画

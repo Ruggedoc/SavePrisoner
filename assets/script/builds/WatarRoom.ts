@@ -4,7 +4,7 @@ import { Utils } from "../Utils";
 import { AudioManager } from "../AudioManager";
 import { MainGame } from "../MainGame";
 import { Npc } from "../actor/Npc";
-import { NpcAniState, State_User } from "../EnumDefine";
+import { NpcAniState, State_User, YDCheckType } from "../EnumDefine";
 import { ShopTrigger } from "./ShopTrigger";
 
 const { ccclass, property } = _decorator;
@@ -392,15 +392,7 @@ export class WatarRoom extends Component {
 
     GameGlobal.iceBoxList.onRefreshFootCollider();
 
-    if (GameGlobal.yindao.curYDId == 2 || GameGlobal.yindao.curYDId == 8) {
-      GameGlobal.yindao.curYDId++;
-    } else if (GameGlobal.yindao.curYDId == 11) {
-      if (GameGlobal.bPlayerOpen) {
-        GameGlobal.yindao.curYDId = 13;
-      } else {
-        GameGlobal.yindao.curYDId = 12;
-      }
-    }
+    GameGlobal.yindao.YDRefresh(YDCheckType.YDThrow);
   }
   //#region 获取扔进池子的落点
   public getThrowTargetPos(): { pos: Vec3; index: number } {

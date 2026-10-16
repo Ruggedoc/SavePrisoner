@@ -5,6 +5,7 @@ import { Moeny } from "./Moeny";
 import { Npc } from "../actor/Npc";
 import { ActorFlyAttribute } from "../actor/ActorFlyAttribute";
 import { GamePool } from "../GamePool";
+import { YDCheckType } from "../EnumDefine";
 const { ccclass, property } = _decorator;
 
 @ccclass("EquipConter")
@@ -133,6 +134,7 @@ export class EquipConter extends Component {
           GameGlobal.actor.checkBagPos();
           GameGlobal.actor.cleanBag();
           GameGlobal.mainGame.updateMoney();
+          GameGlobal.yindao.YDRefresh(YDCheckType.YDEquipCounter);
           // let q: Quat = new Quat();
           // Quat.fromEuler(q, 0, 0, 0);
           // tween(n).to(0.1, { rotation: q });

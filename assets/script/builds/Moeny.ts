@@ -3,6 +3,7 @@ import { Utils } from "../Utils";
 import { GameGlobal } from "../GameGlobal";
 import { ShopTrigger } from "./ShopTrigger";
 import { AudioManager } from "../AudioManager";
+import { YDCheckType } from "../EnumDefine";
 const { ccclass, property } = _decorator;
 
 @ccclass("Moeny")
@@ -171,7 +172,7 @@ export class Moeny extends Component {
   }
 
   onFlyFinish() {
-    if (GameGlobal.actor.bag2.children.length < GameGlobal.moneyBagMax) {
+    if (GameGlobal.actor.bag2.children.length <= GameGlobal.moneyBagMax) {
       this.node.setParent(GameGlobal.actor.bag2);
       this.node.eulerAngles = new Vec3(0, 0, 0);
       GameGlobal.actor.cleanBag();
@@ -190,5 +191,7 @@ export class Moeny extends Component {
     }
     let idx = GameGlobal.curFlyCoin.indexOf(this.node);
     if (idx != -1) GameGlobal.curFlyCoin.splice(idx, 1);
+
+    GameGlobal.yindao.YDRefresh(YDCheckType.YDBattle);
   }
 }
