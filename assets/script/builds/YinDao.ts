@@ -433,7 +433,24 @@ export class YinDao extends Component {
 
   public onNoYDNode2() {
     //钱不够
-    if (this.target_YD_Node != null && this.curAutoTag != 0) return;
+    // if (this.target_YD_Node != null && this.curAutoTag != 0) return;
+    if (this.curAutoTag == 1 && this.target_YD_Node == this.yd[3]) {
+      if (GameGlobal.equipConter.getYDReallyMoney() > 0) {
+        return;
+      } else if (GameGlobal.actor.onGetBag2ReallyCount() >= GameGlobal.moneyBagMax) {
+        return;
+      }
+    }
+    if (this.curAutoTag == 2 && this.target_YD_Node == this.yd[4]) {
+      if (GameGlobal.actor.PropListNode.children.length > 0) {
+        return;
+      } else if (GameGlobal.actor.onGetBag2ReallyCount() >= GameGlobal.moneyBagMax) {
+        return;
+      }
+    }
+    if (this.curAutoTag == 3 && this.target_YD_Node == this.yd[0]) return;
+    if (this.curAutoTag == 4 && this.target_YD_Node == GameGlobal.iceBoxList.bodyList.children[0]) return;
+    if (this.curAutoTag == 5 && this.target_YD_Node == this.yd[2]) return;
     if (GameGlobal.equipConter.getYDReallyMoney() > 0) {
       //柜台有钱
       this.bCheckOnce = false;
@@ -596,9 +613,17 @@ export class YinDao extends Component {
           this.bCheckOnce = true;
           return;
         }
-        if (this.curAutoTag == 1) {
-          this.curAutoTag = 0;
-          this.bCheckOnce = true;
+        if (this.curAutoTag == 1 && this.target_YD_Node == this.yd[3]) {
+          if (GameGlobal.actor.onGetBag2ReallyCount() >= GameGlobal.moneyBagMax) {
+            this.curAutoTag = 0;
+            this.bCheckOnce = true;
+            return;
+          }
+          if (GameGlobal.equipConter.getYDReallyMoney() <= 0) {
+            this.curAutoTag = 0;
+            this.bCheckOnce = true;
+            return;
+          }
         }
         break;
       case YDCheckType.YDBattle:
@@ -613,9 +638,17 @@ export class YinDao extends Component {
         if (GameGlobal.actor.PropListNode.children.length <= 0) {
           this.bCheckOnce = true;
         }
-        if (this.curAutoTag == 2) {
-          this.curAutoTag = 0;
-          this.bCheckOnce = true;
+        if (this.curAutoTag == 2 && this.target_YD_Node == this.yd[4]) {
+          if (GameGlobal.actor.onGetBag2ReallyCount() >= GameGlobal.moneyBagMax) {
+            this.curAutoTag = 0;
+            this.bCheckOnce = true;
+            return;
+          }
+          if (GameGlobal.actor.PropListNode.children.length <= 0) {
+            this.curAutoTag = 0;
+            this.bCheckOnce = true;
+            return;
+          }
         }
         break;
       case YDCheckType.YDMoney:
