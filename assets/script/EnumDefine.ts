@@ -110,6 +110,8 @@ export enum YDCheckType {
   YDBattle,
   /**取金币完成（柜台和战斗地图都可以的情况） */
   YDMoney,
+  /**游戏结束 */
+  GameOver,
 }
 
 export enum YDIDType {

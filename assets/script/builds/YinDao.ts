@@ -484,6 +484,13 @@ export class YinDao extends Component {
         return;
       }
 
+      if (GameGlobal.bPlayerOpen) {
+        this.curAutoTag = 0;
+        this.bCheckOnce = true;
+        this.target_YD_Node = null;
+        GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
+        return;
+      }
       //捡NPC
       if (GameGlobal.iceBoxList.bodyList.children.length > 0) {
         this.curAutoTag = 4;
@@ -656,6 +663,11 @@ export class YinDao extends Component {
           this.curYDId = YDIDType.YDBuyHummer;
         }
         this.bCheckOnce = true;
+        break;
+      case YDCheckType.GameOver:
+        this.bCheckOnce = false;
+        this.target_YD_Node = null;
+        GameGlobal.jianTou2DGuide.setYDNode(this.target_YD_Node);
         break;
       default:
         break;

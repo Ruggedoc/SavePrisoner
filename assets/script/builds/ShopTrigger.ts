@@ -397,6 +397,7 @@ export class ShopTrigger extends Component {
         () => {
           this.node.active = true;
           this.init();
+          GameGlobal.yindao.YDRefresh(YDCheckType.YDBuyDiTie);
           GameGlobal.yindao.curBuyDTStage = 4;
           this.scheduleOnce(() => {
             GameGlobal.CameraControl.cameraMoveToActor(0.5);
