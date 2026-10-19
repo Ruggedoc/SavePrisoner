@@ -14,6 +14,7 @@ import {
   SphereCollider,
   Tween,
   sys,
+  math,
 } from "cc";
 import { GameGlobal } from "../GameGlobal";
 import { IceBox } from "./IceBox";
@@ -180,7 +181,7 @@ export class IceBoxList extends Component {
       new Vec3(0.85, 0.38, -0.7),
     ];
 
-    this.fromPosArr = [new Vec3(-1.2, 0.8, -7), new Vec3(0.23, 0.8, -7), new Vec3(1.3, 0.8, -7)];
+    this.fromPosArr = [new Vec3(-1.2, 0.3, -7), new Vec3(0.23, 0.3, -7), new Vec3(1.3, 0.3, -7)];
   }
 
   public loadIceBoxPos() {
@@ -373,7 +374,13 @@ export class IceBoxList extends Component {
     // if (GameGlobal.curIceNumStage == 1) this.addNpc();
     // else if (GameGlobal.curIceNumStage == 2) this.addNpc2();
     // else this.addNpc2();
-    this.addNpc();
+    if (GameGlobal.curIceNumStage == 1) {
+      this.addNpc1();
+    } else {
+      this.addNpc1();
+      this.addNpc2();
+      this.addNpc3();
+    }
     this.scheduleOnce(() => {
       GameGlobal.curIceNumStage == 1 ? this.nextIceBox() : this.nextIceBox2();
     }, 0.2);
@@ -430,7 +437,7 @@ export class IceBoxList extends Component {
     const controlPos = new Vec3(0, 0, 0);
     Vec3.add(controlPos, startPos, pos);
     controlPos.multiplyScalar(0.5);
-    controlPos.add3f(0, 3, 0);
+    controlPos.add3f(0, 5, 0);
     node.worldScale = Vec3.ONE;
     tween(node)
       .to(
@@ -449,26 +456,61 @@ export class IceBoxList extends Component {
       .start();
   }
 
-  public npcCount: number = 0;
+  private moveToPos2(node: Node, pos: Vec3, angle: Vec3, delay: number, accel: number = 0, callback?) {
+    const startPos = node.position.clone();
+    const startQuat = node.rotation.clone();
+    const endQuat = new Quat();
+    Quat.fromEuler(endQuat, angle.x, angle.y, angle.z);
+    const tempVec3 = new Vec3(0, 0, 0);
+    const tempQuat = new Quat();
+    const controlPos = new Vec3(0, 0, 0);
+    Vec3.add(controlPos, startPos, pos);
+    controlPos.multiplyScalar(0.5);
+    controlPos.add3f(0, 3, 0);
+    node.worldScale = Vec3.ONE;
+    tween(node)
+      .to(
+        delay,
+        { position: pos },
+        {
+          onUpdate: (target, ratio) => {
+            const easedRatio = (1 - accel) * ratio + accel * ratio * ratio;
+            Utils.bezierCurve(easedRatio, startPos, controlPos, pos, tempVec3);
+            node.setPosition(tempVec3);
+            Quat.slerp(tempQuat, startQuat, endQuat, ratio);
+            node.setRotation(tempQuat);
+          },
+        },
+      )
+      .call(() => {
+        callback && callback();
+      })
+      .start();
+  }
+
+  public npcCount1: number = 0;
   /**
    * 生成尸体
    * @returns
    */
-  public addNpc() {
-    if (this.npcCount >= 4 * GameGlobal.buyHummerNum) {
-      this.npcCount = 0;
+  public addNpc1() {
+    if (this.npcCount1 >= 4) {
+      this.npcCount1 = 0;
       GameGlobal.isBodyReady = true;
       return;
     }
-    this.npcCount++;
+    this.npcCount1++;
     const npcNode = GamePool.inst.poolGet("Npc");
     npcNode.getComponent(Npc).initData();
     npcNode.setParent(this.bodyList);
     const pos2 = this.getNextNpcPos();
-    npcNode.setPosition(this.getNpcInitPos());
-    npcNode.setRotationFromEuler(0, 0, 0);
-    npcNode.setRotationFromEuler(90, Utils.randomRange(-45, 45), Utils.randomRange(0, 180));
-    this.moveToPos(npcNode, pos2, 0.35, () => {
+    npcNode.setPosition(this.getNpcInitPos(0));
+    npcNode.setRotationFromEuler(90, 90, 0);
+    const randomAngleY = math.randomRange(-45, 45);
+    const randomAngleZ = math.randomRange(0, 360);
+    const targetAngle = new Vec3(90, randomAngleY, randomAngleZ);
+    const flyTime = 0.5;
+    this.moveToPos2(npcNode, pos2, targetAngle, flyTime, 0.5, () => {
       npcNode.getComponent(Npc).isready = true;
       if (this.bodyList.children.length >= GameGlobal.saveMaxNum) {
         if (GamePool.inst) {
@@ -480,33 +522,32 @@ export class IceBoxList extends Component {
         }
       }
     });
-
-    // GameGlobal.npcBarList.onAddBar(npcNode);
-    this.scheduleOnce(() => {
-      this.addNpc();
-    }, 0.01);
+    this.addNpc1();
   }
 
+  public npcCount2: number = 0;
   /**
    * 生成尸体
    * @returns
    */
   public addNpc2() {
-    if (this.npcCount >= 4 * GameGlobal.buyHummerNum) {
-      this.npcCount = 0;
+    if (this.npcCount2 >= 4) {
+      this.npcCount2 = 0;
       GameGlobal.isBodyReady = true;
       return;
     }
-    this.npcCount++;
+    this.npcCount2++;
     const npcNode = GamePool.inst.poolGet("Npc");
     npcNode.getComponent(Npc).initData();
     npcNode.setParent(this.bodyList);
     const pos2 = this.getNextNpcPos();
-
-    npcNode.setPosition(this.getNpcInitPos());
-    npcNode.setRotationFromEuler(0, 0, 0);
-    npcNode.setRotationFromEuler(90, Utils.randomRange(-45, 45), Utils.randomRange(0, 180));
-    this.moveToPos(npcNode, pos2, 0.25, () => {
+    npcNode.setPosition(this.getNpcInitPos(1));
+    npcNode.setRotationFromEuler(90, 90, 0);
+    const randomAngleY = math.randomRange(-45, 45);
+    const randomAngleZ = math.randomRange(0, 360);
+    const targetAngle = new Vec3(90, randomAngleY, randomAngleZ);
+    const flyTime = 0.6;
+    this.moveToPos2(npcNode, pos2, targetAngle, flyTime, 0.5, () => {
       npcNode.getComponent(Npc).isready = true;
       if (this.bodyList.children.length >= GameGlobal.saveMaxNum) {
         if (GamePool.inst) {
@@ -514,20 +555,54 @@ export class IceBoxList extends Component {
           npcNode.removeFromParent();
           GamePool.inst.poolPut("Npc", npcNode);
         } else {
-          npcNode.removeFromParent();
           npcNode.destroy();
         }
       }
     });
-
-    // GameGlobal.npcBarList.onAddBar(npcNode);
-    this.scheduleOnce(() => {
-      this.addNpc2();
-    }, 0.01);
+    this.addNpc2();
   }
-  public getNpcInitPos() {
+  public npcCount3: number = 0;
+  /**
+   * 生成尸体
+   * @returns
+   */
+  public addNpc3() {
+    if (this.npcCount3 >= 4) {
+      this.npcCount3 = 0;
+      GameGlobal.isBodyReady = true;
+      return;
+    }
+    this.npcCount3++;
+    const npcNode = GamePool.inst.poolGet("Npc");
+    npcNode.getComponent(Npc).initData();
+    npcNode.setParent(this.bodyList);
+    const pos2 = this.getNextNpcPos();
+    npcNode.setPosition(this.getNpcInitPos(2));
+    npcNode.setRotationFromEuler(90, 90, 0);
+    const randomAngleY = math.randomRange(-45, 45);
+    const randomAngleZ = math.randomRange(0, 360);
+    const targetAngle = new Vec3(90, randomAngleY, randomAngleZ);
+    const flyTime = 0.8;
+    this.moveToPos2(npcNode, pos2, targetAngle, flyTime, 0.5, () => {
+      npcNode.getComponent(Npc).isready = true;
+      if (this.bodyList.children.length >= GameGlobal.saveMaxNum) {
+        if (GamePool.inst) {
+          Tween.stopAllByTarget(npcNode);
+          npcNode.removeFromParent();
+          GamePool.inst.poolPut("Npc", npcNode);
+        } else {
+          npcNode.destroy();
+        }
+      }
+    });
+    this.addNpc3();
+  }
+
+  public getNpcInitPos(iceNum: number) {
     const idx = Math.floor(Utils.randomRange(0, 3));
-    if (idx >= 0 && idx < this.fromPosArr.length) return this.fromPosArr[idx];
+    const offest = -6.5 * iceNum;
+    const result = new Vec3(this.fromPosArr[idx].x, this.fromPosArr[idx].y, this.fromPosArr[idx].z + offest);
+    return result;
   }
 
   public getNextNpcPos() {

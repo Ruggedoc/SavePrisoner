@@ -95,6 +95,16 @@
             "params": []
           },
           {
+            "frame": 0.3333333333333333,
+            "func": "",
+            "params": []
+          },
+          {
+            "frame": 0.3333333333333333,
+            "func": "onNpcCreate",
+            "params": []
+          },
+          {
             "frame": 0.4,
             "func": "",
             "params": []
@@ -102,16 +112,6 @@
           {
             "frame": 0.4,
             "func": "onPlayHummerDown",
-            "params": []
-          },
-          {
-            "frame": 1,
-            "func": "",
-            "params": []
-          },
-          {
-            "frame": 1,
-            "func": "onNpcCreate",
             "params": []
           }
         ],
