@@ -2209,7 +2209,7 @@
     "propertyPath": [
       "_active"
     ],
-    "value": true
+    "value": false
   },
   {
     "__type__": "cc.TargetInfo",
@@ -3955,7 +3955,7 @@
       "b": 82,
       "a": 255
     },
-    "_id": "01L2OgODhO/LDmmf0Vj03t"
+    "_id": "97pj5Cwq9GNq49QSWyTtWd"
   },
   {
     "__type__": "cc.CompPrefabInfo",
@@ -4008,7 +4008,7 @@
       "b": 11,
       "a": 0
     },
-    "_id": "dcanMx2y9AxrNafQuW1qkW"
+    "_id": "84PnPrH3RO8rgLWVKk03wy"
   },
   {
     "__type__": "cc.CompPrefabInfo",
@@ -4061,7 +4061,7 @@
       "b": 255,
       "a": 0
     },
-    "_id": "c1Xonmzi5Ha4Irp4lZ1afA"
+    "_id": "dbRWqXoP9JR7yqlqjNjEmF"
   },
   {
     "__type__": "cc.CompPrefabInfo",
@@ -5030,7 +5030,7 @@
       "b": 182,
       "a": 255
     },
-    "_id": "53WYeuDF9GUp5itBpYFlft"
+    "_id": "29yx+8wSJERJV2sge+9q5b"
   },
   {
     "__type__": "cc.CompPrefabInfo",
